@@ -3,7 +3,8 @@ package com.apc.sis.javaProject.handler.api;
 import com.amazonaws.serverless.proxy.internal.testutils.MockLambdaContext;
 
 import com.apc.sis.javaProject.GatewayResponse;
-
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,7 +25,7 @@ public class PirSensorHandlerTest {
 
     // A mock class for com.amazonaws.services.lambda.runtime.Context
     private final MockLambdaContext mockLambdaContext = new MockLambdaContext();
-    private final Object input = new Object();
+    private final APIGatewayProxyRequestEvent event = new APIGatewayProxyRequestEvent();
 
     /**
      * Initializing variables before we run the tests.
@@ -52,7 +53,7 @@ public class PirSensorHandlerTest {
     @Test
     @DisplayName("Basic test for request handler")
     void testHandleRequest() {
-        GatewayResponse response = (GatewayResponse) new PirSensorHandler().handleRequest(input, mockLambdaContext);
+        GatewayResponse response = (GatewayResponse) new PirSensorHandler().handleRequest(event, mockLambdaContext);
 
         // Verify the response obtained matches the values we expect.
         JSONObject jsonObjectFromResponse = new JSONObject(response.getBody());
