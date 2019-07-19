@@ -1,8 +1,8 @@
-package com.aws.codestar.projecttemplates.handler;
+package com.apc.sis.javaProject.handler.api;
 
 import com.amazonaws.serverless.proxy.internal.testutils.MockLambdaContext;
 
-import com.aws.codestar.projecttemplates.GatewayResponse;
+import com.apc.sis.javaProject.GatewayResponse;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests for {@link HelloWorldHandler}. Modify the tests in order to support your use case as you build your project.
  */
-@DisplayName("Tests for HelloWorldHandler")
-public class HelloWorldHandlerTest {
+@DisplayName("Tests for PirSensorHandler")
+public class PirSensorHandlerTest {
 
     private static final String EXPECTED_CONTENT_TYPE = "application/json";
     private static final String EXPECTED_RESPONSE_VALUE = "Hello World!";
@@ -52,7 +52,7 @@ public class HelloWorldHandlerTest {
     @Test
     @DisplayName("Basic test for request handler")
     void testHandleRequest() {
-        GatewayResponse response = (GatewayResponse) new HelloWorldHandler().handleRequest(input, mockLambdaContext);
+        GatewayResponse response = (GatewayResponse) new PirSensorHandler().handleRequest(input, mockLambdaContext);
 
         // Verify the response obtained matches the values we expect.
         JSONObject jsonObjectFromResponse = new JSONObject(response.getBody());
