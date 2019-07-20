@@ -28,7 +28,6 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: javaProject.handler.api.PirSensorHandler
-      FunctionName: GetHelloWorld
       Runtime: java8
       Description: '(yuki-kodama Lambda Java8) GetHelloWorld Lambda in Java8.'
       MemorySize: 128
@@ -48,7 +47,6 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: javaProject.handler.api.PirSensorHandler
-      FunctionName: PostHelloWorld
       Runtime: java8
       Description: '(yuki-kodama Lambda Java8) PostHelloWorld Lambda in Java8.'
       MemorySize: 128

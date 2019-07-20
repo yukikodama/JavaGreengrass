@@ -46,6 +46,11 @@
             <systemPath>${basedir}/lib/GrovePi-pi4j-0.1.0-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>3.13.3</version>
+        </dependency>
+        <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
             <version>1.2.0</version>
