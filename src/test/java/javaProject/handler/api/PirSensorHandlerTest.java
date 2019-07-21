@@ -53,7 +53,6 @@ public class PirSensorHandlerTest {
     @DisplayName("Basic test for request handler")
     void testHandleRequest() {
         APIGatewayProxyResponseEvent response = new PirSensorHandler().handleRequest(event, mockLambdaContext);
-
         // Verify the response obtained matches the values we expect.
         JSONObject jsonObjectFromResponse = new JSONObject(response.getBody());
         assertEquals(EXPECTED_RESPONSE_VALUE, jsonObjectFromResponse.get("Output"));
