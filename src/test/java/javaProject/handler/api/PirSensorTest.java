@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Tests for {@link HelloWorldHandler}. Modify the tests in order to support your use case as you build your project.
+ * Tests for {@link PirSensor}. Modify the tests in order to support your use case as you build your project.
  */
 @DisplayName("Tests for PirSensorHandler")
-public class PirSensorHandlerTest {
+public class PirSensorTest {
 
     private static final String EXPECTED_CONTENT_TYPE = "application/json";
-    private static final String EXPECTED_RESPONSE_VALUE = "Hello World!";
+    private static final String EXPECTED_RESPONSE_VALUE = "Hello Pir Sensor!";
     private static final Integer EXPECTED_STATUS_CODE_SUCCESS = 200;
 
     // A mock class for com.amazonaws.services.lambda.runtime.Context
@@ -47,12 +47,12 @@ public class PirSensorHandlerTest {
     }
 
     /**
-     * Basic test to verify the result obtained when calling {@link HelloWorldHandler} successfully.
+     * Basic test to verify the result obtained when calling {@link PirSensor} successfully.
      */
     @Test
     @DisplayName("Basic test for request handler")
     void testHandleRequest() {
-        APIGatewayProxyResponseEvent response = new PirSensorHandler().handleRequest(event, mockLambdaContext);
+        APIGatewayProxyResponseEvent response = new PirSensor().handleRequest(event, mockLambdaContext);
         // Verify the response obtained matches the values we expect.
         JSONObject jsonObjectFromResponse = new JSONObject(response.getBody());
         assertEquals(EXPECTED_RESPONSE_VALUE, jsonObjectFromResponse.get("Output"));
