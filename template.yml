@@ -64,7 +64,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: javaProject.handler.api.PirSensor
-      FunctionName: GetApiPirSensor
+      # FunctionName: GetApiPirSensor
       Runtime: java8
       Description: '(yuki-kodama Lambda Java8) GetApiPirSensor Lambda in Java8.'
       MemorySize: 128
@@ -83,7 +83,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: javaProject.handler.api.PirSensor
-      FunctionName: PostApiPirSensor
+      #FunctionName: PostApiPirSensor
       Runtime: java8
       Description: '(yuki-kodama Lambda Java8) PostApiPirSensor Lambda in Java8.'
       MemorySize: 128
