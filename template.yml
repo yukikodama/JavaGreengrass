@@ -60,6 +60,44 @@ Resources:
           Properties:
             Path: /pir
             Method: post
+  GetApiPirSensor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: javaProject.handler.api.PirSensor
+      FunctionName: GetApiPirSensor
+      Runtime: java8
+      Description: '(yuki-kodama Lambda Java8) GetApiPirSensor Lambda in Java8.'
+      MemorySize: 128
+      Timeout: 60
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /pirSensor
+            Method: get
+  PostApiPirSensor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: javaProject.handler.api.PirSensor
+      FunctionName: PostApiPirSensor
+      Runtime: java8
+      Description: '(yuki-kodama Lambda Java8) PostApiPirSensor Lambda in Java8.'
+      MemorySize: 128
+      Timeout: 60
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+      Events:
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /pirSensor
+            Method: post
   HelloWorldGreengrass:
     Type: AWS::Serverless::Function
     Properties:
