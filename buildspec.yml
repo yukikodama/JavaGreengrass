@@ -14,7 +14,7 @@ phases:
       - echo Build started on `date`
       - mvn package shade:shade
       - mv target/JavaProject-1.0.jar .
-      - unzip JavaProject-1.0.jar
+      - unzip -o JavaProject-1.0.jar
       - rm -rf target tst src buildspec.yml pom.xml JavaProject-1.0.jar
       - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
   post_build:
