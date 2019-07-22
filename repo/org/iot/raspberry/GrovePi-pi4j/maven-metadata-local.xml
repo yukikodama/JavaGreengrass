@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.iot.raspberry</groupId>
+  <artifactId>GrovePi-pi4j</artifactId>
+  <versioning>
+    <versions>
+      <version>0.1.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20190722075138</lastUpdated>
+  </versioning>
+</metadata>

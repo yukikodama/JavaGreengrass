@@ -28,22 +28,28 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-greengrass</artifactId>
             <version>1.0</version>
+            <!--
             <scope>system</scope>
             <systemPath>${basedir}/lib/GreengrassJavaSDK-1.0.jar</systemPath>
+            -->
         </dependency>
         <dependency>
             <groupId>org.iot.raspberry</groupId>
             <artifactId>GrovePi-spec</artifactId>
             <version>0.1.0-SNAPSHOT</version>
+            <!--
             <scope>system</scope>
             <systemPath>${basedir}/lib/GrovePi-spec-0.1.0-SNAPSHOT.jar</systemPath>
+            -->
         </dependency>
         <dependency>
             <groupId>org.iot.raspberry</groupId>
             <artifactId>GrovePi-pi4j</artifactId>
             <version>0.1.0-SNAPSHOT</version>
+            <!--
             <scope>system</scope>
             <systemPath>${basedir}/lib/GrovePi-pi4j-0.1.0-SNAPSHOT.jar</systemPath>
+            -->
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -197,4 +203,11 @@
             </plugins>
         </pluginManagement>
     </build>
+    <repositories>
+        <repository>
+            <id>localrepo</id>
+            <name>localrepo</name>
+            <url>file://${basedir}/repo/</url>
+        </repository>
+    </repositories>
 </project>
