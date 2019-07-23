@@ -65,7 +65,7 @@ Resources:
   HelloWorldGreengrass:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: javaProject.handler.greengrass.HelloWorld
+      Handler: javaProject.handler.greengrass.HelloWorld::handleRequest
       FunctionName: HelloWorldGreengrass
       Runtime: java8
       Description: '(yuki-kodama Lambda Java8) HelloWorldGreengrass Lambda in Java8.'
