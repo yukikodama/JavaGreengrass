@@ -12,8 +12,7 @@ import com.amazonaws.greengrass.javasdk.model.*;
 public class HelloWorld {
     static {
         Timer timer = new Timer();
-        // Repeat publishing a message every 5 seconds
-        timer.scheduleAtFixedRate(new PublishHelloWorld(), 0, 5000);
+        timer.scheduleAtFixedRate(new PublishHelloWorld(), 0, 10000);
     }
 
     public String handleRequest(Object input, Context context) {

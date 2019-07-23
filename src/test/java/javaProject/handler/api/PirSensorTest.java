@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests for {@link PirSensor}. Modify the tests in order to support your use case as you build your project.
  */
-@DisplayName("Tests for PirSensorHandler")
+@DisplayName("Tests for PirSensor")
 public class PirSensorTest {
 
     private static final String EXPECTED_CONTENT_TYPE = "application/json";
