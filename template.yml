@@ -24,13 +24,13 @@ Globals:
       Role: !Ref CodeDeployRole
 
 Resources:
-  GetApiPirSensor:
+  ApiPirSensor:
     Type: AWS::Serverless::Function
     Properties:
       Handler: javaProject.handler.api.PirSensor
-      # FunctionName: GetApiPirSensor
+      # FunctionName: ApiPirSensor
       Runtime: java8
-      Description: '(yuki-kodama Lambda Java8) GetApiPirSensor Lambda in Java8.'
+      Description: '(yuki-kodama Lambda Java8) ApiPirSensor Lambda in Java8.'
       MemorySize: 128
       Timeout: 30
       Role:
@@ -43,20 +43,6 @@ Resources:
           Properties:
             Path: /pirSensor
             Method: get
-  PostApiPirSensor:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: javaProject.handler.api.PirSensor
-      #FunctionName: PostApiPirSensor
-      Runtime: java8
-      Description: '(yuki-kodama Lambda Java8) PostApiPirSensor Lambda in Java8.'
-      MemorySize: 128
-      Timeout: 30
-      Role:
-        Fn::GetAtt:
-          - LambdaExecutionRole
-          - Arn
-      Events:
         PostEvent:
           Type: Api
           Properties:
