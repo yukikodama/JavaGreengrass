@@ -3,7 +3,6 @@ package javaProject.handler.greengrass;
 import com.amazonaws.greengrass.javasdk.IotDataClient;
 import com.amazonaws.greengrass.javasdk.model.PublishRequest;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -34,6 +33,7 @@ public class PirSensor extends TimerTask {
 
     private GroveDigitalIn digitalIn2;
     private GroveDigitalOut digitalOut3;
+    private GroveDigitalOut digitalOut4;
     private int count = 0;
 
     static {
@@ -50,6 +50,7 @@ public class PirSensor extends TimerTask {
         serial = m.find() ? m.group(1) : "none";
         digitalIn2 = new GrovePi4J().getDigitalIn(2);
         digitalOut3 = new GrovePi4J().getDigitalOut(3);
+        digitalOut4 = new GrovePi4J().getDigitalOut(4);
     }
 
     public Item getItem() {
@@ -57,12 +58,23 @@ public class PirSensor extends TimerTask {
         return table.getItem(getItemSpec);
     }
 
+    public void putItem() {
+        Item item = new Item().withPrimaryKey("RequestType", "restroom").withString("Request", "0");
+        table.putItem(item);
+    }
+
     @Override
     public void run() {
         try {
             boolean b = digitalIn2.get();
-            String request = getItem().get("Request").toString();
-            digitalOut3.set(BooleanUtils.toBoolean(request));
+            digitalOut3.set(b);
+            if (b) {
+                String request = getItem().get("Request").toString();
+                digitalOut4.set(BooleanUtils.toBoolean(Integer.valueOf(request)));
+            } else {
+                putItem();
+                digitalOut4.set(false);
+            }
             String publishMessage = new JSONObject().put("SensorId", serial).put("Pir", BooleanUtils.toInteger(b)).put("Count", count++).toString();
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
