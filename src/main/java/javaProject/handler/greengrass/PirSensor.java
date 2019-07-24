@@ -2,6 +2,13 @@ package javaProject.handler.greengrass;
 
 import com.amazonaws.greengrass.javasdk.IotDataClient;
 import com.amazonaws.greengrass.javasdk.model.PublishRequest;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.lambda.runtime.Context;
 import org.apache.commons.lang3.BooleanUtils;
 import org.iot.raspberry.grovepi.GroveDigitalIn;
@@ -22,6 +29,7 @@ public class PirSensor extends TimerTask {
     private static final String CPUINFO = "/proc/cpuinfo";
 
     private IotDataClient iotDataClient = new IotDataClient();
+    private Table table = new DynamoDB(AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build()).getTable("request");
     private String serial;
 
     private GroveDigitalIn digitalIn2;
@@ -40,15 +48,21 @@ public class PirSensor extends TimerTask {
     private PirSensor() throws Exception {
         Matcher m = Pattern.compile("Serial\\s+:\\s+(\\w{16})").matcher(new String(Files.readAllBytes(Paths.get(CPUINFO))));
         serial = m.find() ? m.group(1) : "none";
-        digitalIn2  = new GrovePi4J().getDigitalIn(2);
+        digitalIn2 = new GrovePi4J().getDigitalIn(2);
         digitalOut3 = new GrovePi4J().getDigitalOut(3);
+    }
+
+    public Item getItem() {
+        GetItemSpec getItemSpec = new GetItemSpec().withPrimaryKey("RequestType", "restroom");
+        return table.getItem(getItemSpec);
     }
 
     @Override
     public void run() {
         try {
             boolean b = digitalIn2.get();
-            digitalOut3.set(b);
+            String request = getItem().get("Request").toString();
+            digitalOut3.set(BooleanUtils.toBoolean(request));
             String publishMessage = new JSONObject().put("SensorId", serial).put("Pir", BooleanUtils.toInteger(b)).put("Count", count++).toString();
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
