@@ -29,7 +29,7 @@ public class PirSensor extends TimerTask {
     private static final String CPUINFO = "/proc/cpuinfo";
 
     private IotDataClient iotDataClient = new IotDataClient();
-    private Table table = new DynamoDB(AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build()).getTable("request");
+    private Table table = new DynamoDB(AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build()).getTable("Request");
     private String serial;
 
     private GroveDigitalIn digitalIn2;
