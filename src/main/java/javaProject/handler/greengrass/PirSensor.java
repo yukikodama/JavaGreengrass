@@ -59,7 +59,7 @@ public class PirSensor extends TimerTask {
     }
 
     public void putItem() {
-        Item item = new Item().withPrimaryKey("RequestType", "restroom").withString("Request", "0");
+        Item item = new Item().withPrimaryKey("RequestType", "restroom").withNumber("Request", 0);
         table.putItem(item);
     }
 
@@ -69,13 +69,13 @@ public class PirSensor extends TimerTask {
             boolean b = digitalIn2.get();
             digitalOut3.set(b);
             if (b) {
-                String request = getItem().get("Request").toString();
-                digitalOut4.set(BooleanUtils.toBoolean(Integer.valueOf(request)));
+                Integer request = (Integer) getItem().get("Request");
+                digitalOut4.set(BooleanUtils.toBoolean(request));
             } else {
                 putItem();
                 digitalOut4.set(false);
             }
-            String publishMessage = new JSONObject().put("SensorId", serial).put("Pir", BooleanUtils.toInteger(b)).put("Count", count++).toString();
+            String publishMessage = new JSONObject().put("SensorId", serial).put("Pir", BooleanUtils.toInteger(b)).put("During", 10 * count++).toString();
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
             System.err.println(ex);
