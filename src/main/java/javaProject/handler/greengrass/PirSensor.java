@@ -59,7 +59,7 @@ public class PirSensor extends TimerTask {
     }
 
     public void putItem() {
-        Item item = new Item().withPrimaryKey("RequestType", "restroom").withNumber("Request", 0);
+        Item item = new Item().withPrimaryKey("RequestType", "restroom").withInt("Request", 0);
         table.putItem(item);
     }
 
@@ -70,7 +70,7 @@ public class PirSensor extends TimerTask {
             digitalOut3.set(b);
             int request = 0;
             if (b) {
-                request = ((Integer) getItem().get("Request")).intValue();
+                request = ((java.math.BigDecimal) getItem().get("Request")).intValue();
                 digitalOut4.set(BooleanUtils.toBoolean(request));
             } else {
                 putItem();
