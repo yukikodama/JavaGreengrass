@@ -37,9 +37,8 @@ public class PirSensor extends TimerTask {
     private int count = 0;
 
     static {
-        Timer timer = new Timer();
         try {
-            timer.scheduleAtFixedRate(new PirSensor(), 0, 10000);
+            new Timer().scheduleAtFixedRate(new PirSensor(), 0, 10000);
         } catch (Exception ex) {
             System.err.println(ex);
         }
@@ -54,13 +53,11 @@ public class PirSensor extends TimerTask {
     }
 
     public Item getItem() {
-        GetItemSpec getItemSpec = new GetItemSpec().withPrimaryKey("RequestType", "restroom");
-        return table.getItem(getItemSpec);
+        return table.getItem(new GetItemSpec().withPrimaryKey("RequestType", "restroom"));
     }
 
     public void putItem() {
-        Item item = new Item().withPrimaryKey("RequestType", "restroom").withInt("Request", 0);
-        table.putItem(item);
+        table.putItem(new Item().withPrimaryKey("RequestType", "restroom").withInt("Request", 0));
     }
 
     @Override
