@@ -18,6 +18,9 @@ import org.json.JSONObject;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -35,6 +38,7 @@ public class PirSensor extends TimerTask {
     private GroveDigitalOut digitalOut3;
     private GroveDigitalOut digitalOut4;
     private int count = 0;
+    private long createAt;
 
     static {
         try {
@@ -47,6 +51,7 @@ public class PirSensor extends TimerTask {
     private PirSensor() throws Exception {
         Matcher m = Pattern.compile("Serial\\s+:\\s+(\\w{16})").matcher(new String(Files.readAllBytes(Paths.get(CPUINFO))));
         serial = m.find() ? m.group(1) : "none";
+        createAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
         digitalIn2 = new GrovePi4J().getDigitalIn(2);
         digitalOut3 = new GrovePi4J().getDigitalOut(3);
         digitalOut4 = new GrovePi4J().getDigitalOut(4);
@@ -63,6 +68,7 @@ public class PirSensor extends TimerTask {
     @Override
     public void run() {
         try {
+            long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
             boolean b = digitalIn2.get();
             digitalOut3.set(b);
             int request = 0;
@@ -73,7 +79,13 @@ public class PirSensor extends TimerTask {
                 putItem();
                 digitalOut4.set(false);
             }
-            String publishMessage = new JSONObject().put("SensorId", serial).put("Pir", BooleanUtils.toInteger(b)).put("During", 10 * count++).put("request", request).toString();
+            String publishMessage = new JSONObject()
+                    .put("SensorId", serial)
+                    .put("Pir", BooleanUtils.toInteger(b))
+                    .put("During", 10 * count++)
+                    .put("CreateAt", createAt)
+                    .put("UpdateAt", updateAt)
+                    .put("Request", request).toString();
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
             System.err.println(ex);
