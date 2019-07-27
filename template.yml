@@ -27,11 +27,11 @@ Resources:
   ApiPirSensor:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: javaProject.handler.api.PirSensor
+      Handler: javaProject.handler.api.PirSensor::handleRequest
       # FunctionName: ApiPirSensor
       Runtime: java8
       Description: '(yuki-kodama Lambda Java8) ApiPirSensor Lambda in Java8.'
-      MemorySize: 128
+      MemorySize: 256
       Timeout: 30
       Role:
         Fn::GetAtt:
