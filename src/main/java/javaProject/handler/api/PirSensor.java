@@ -12,7 +12,9 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
@@ -20,21 +22,36 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
 
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
 
+    int getLimit(APIGatewayProxyRequestEvent event) {
+        int limit = 1;
+        try {
+            limit = Integer.valueOf(event.getQueryStringParameters().get("limit"));
+            if (limit <= 0 || 60 < limit ) {
+                limit = 1;
+            }
+        } catch (Exception e) {
+            logger.log(e.getMessage());
+        }
+        return limit;
+    }
+
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent event, final Context context) {
         logger = context.getLogger();
         logger.log("event: " + event);
         logger.log("context: " + context);
 
+        int limit = this.getLimit(event);
         ScanResult scanResult = amazonDynamoDB.scan(new ScanRequest().withTableName("Sensor"));
         logger.log(scanResult.toString());
         Stream<String> sensorIds = scanResult.getItems().stream().map(item -> item.get("SensorId").getS());
-        sensorIds.forEach(sensorId -> {
+        List<Map<String, AttributeValue>> pirSensor = sensorIds.map(sensorId -> {
             Map<String, AttributeValue> values = new HashMap<>();
             values.put(":s", new AttributeValue().withS(sensorId));
-            QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").withExpressionAttributeValues(values).withLimit(10).withScanIndexForward(false);
+            QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").withExpressionAttributeValues(values).withLimit(limit).withScanIndexForward(false);
             QueryResult queryResult = amazonDynamoDB.query(queryRequest);
-            logger.log("queryResult: " + queryResult.getItems());
-        });
+            return queryResult.getItems();
+        }).flatMap(m -> m.stream()).distinct().collect(Collectors.toList());
+        logger.log("pirSensor" + pirSensor);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
