@@ -3,7 +3,6 @@ package javaProject.handler.api;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -13,7 +12,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     static LambdaLogger logger = null;
@@ -25,8 +23,8 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         logger.log("event: " + event);
         logger.log("context: " + context);
 
-        ScanResult scanResult = amazonDynamoDB.scan(new ScanRequest().withTableName("Sensor"));
-        logger.log(scanResult.toString());
+//        ScanResult scanResult = amazonDynamoDB.scan(new ScanRequest().withTableName("Sensor"));
+//        logger.log(scanResult.toString());
 //        Stream<String> sensorIds = scanResult.getItems().stream().map(item -> item.get("SensorId").getS());
 //        sensorIds.forEach(sensorId -> {
 //            Map<String, AttributeValue> values = new HashMap<>();
