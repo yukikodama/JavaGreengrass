@@ -22,11 +22,12 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
     static LambdaLogger logger = null;
 
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
+    private ScanRequest sensorScanRequest = new ScanRequest().withTableName("Sensor");
 
     int getLimit(APIGatewayProxyRequestEvent event) {
         try {
             int limit = Integer.valueOf(event.getQueryStringParameters().get("limit"));
-            return (limit <= 0 || 60 < limit ) ? 1 : limit;
+            return (limit <= 0 || 60 < limit) ? 1 : limit;
         } catch (Exception e) {
             return 1;
         }
@@ -48,12 +49,16 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         logger.log("event: " + event);
         logger.log("context: " + context);
 
-        ScanResult scanResult = amazonDynamoDB.scan(new ScanRequest().withTableName("Sensor"));
+        if ("POST".equals(event.getHttpMethod().toUpperCase())) {
+
+        }
+
+        ScanResult scanResult = amazonDynamoDB.scan(sensorScanRequest);
         Stream<String> sensorIds = scanResult.getItems().stream().map(item -> item.get("SensorId").getS());
         List<JSONObject> pirSensor = sensorIds.map(sensorId -> {
-            Map<String, AttributeValue> values = new HashMap<>();
-            values.put(":s", new AttributeValue().withS(sensorId));
-            QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").withExpressionAttributeValues(values).withLimit(this.getLimit(event)).withScanIndexForward(false);
+            //Map<String, AttributeValue> values = new HashMap<>();
+            //values.put(":s", new AttributeValue().withS(sensorId));
+            QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false);
             QueryResult queryResult = amazonDynamoDB.query(queryRequest);
             return queryResult.getItems().stream().map(m -> this.createJSONObject(m));
         }).flatMap(m -> m).peek(System.out::println).distinct().collect(Collectors.toList());
