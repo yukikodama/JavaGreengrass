@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     static LambdaLogger logger = null;
@@ -25,7 +24,13 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
     private ScanRequest sensorScanRequest = new ScanRequest().withTableName("Sensor");
 
-    int getLimit(APIGatewayProxyRequestEvent event) {
+    protected Map<String, String> headers = new HashMap<>();
+    public PirSensor() {
+        headers.put("Content-Type", "application/json");
+        headers.put("Access-Control-Allow-Origin", "*");
+    }
+
+    int getLimit(final APIGatewayProxyRequestEvent event) {
         try {
             int limit = Integer.valueOf(event.getQueryStringParameters().get("limit"));
             return (limit <= 0 || 60 < limit) ? 1 : limit;
@@ -34,7 +39,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         }
     }
 
-    JSONObject createJSONObject(Map<String, AttributeValue> m) {
+    JSONObject createJSONObject(final Map<String, AttributeValue> m) {
         return new JSONObject()
                 .put("SensorId", m.get("SensorId").getS())
                 .put("CreateAt", Long.valueOf(m.get("CreateAt").getN()))
@@ -56,16 +61,11 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         }
 
         ScanResult scanResult = amazonDynamoDB.scan(sensorScanRequest);
-        Stream<String> sensorIds = scanResult.getItems().stream().map(item -> item.get("SensorId").getS());
-        List<JSONObject> pirSensor = sensorIds.map(sensorId -> {
-            QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false);
-            QueryResult queryResult = amazonDynamoDB.query(queryRequest);
+        List<JSONObject> pirSensor = scanResult.getItems().stream().map(item -> item.get("SensorId").getS()).map(sensorId -> {
+            QueryResult queryResult = amazonDynamoDB.query(new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false));
             return queryResult.getItems().stream().map(m -> this.createJSONObject(m));
         }).flatMap(m -> m).peek(System.out::println).distinct().collect(Collectors.toList());
 
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Access-Control-Allow-Origin", "*");
         return new APIGatewayProxyResponseEvent().withStatusCode(200).withHeaders(headers).withBody(new JSONArray().put(pirSensor).toString());
     }
 }

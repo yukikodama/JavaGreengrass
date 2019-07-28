@@ -21,7 +21,6 @@ import java.nio.file.Paths;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -33,6 +32,8 @@ public class PirSensor extends TimerTask {
 
     private IotDataClient iotDataClient = new IotDataClient();
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
+    private GetItemRequest requestGetItemRequest = new GetItemRequest().withTableName("Request").addKeyEntry("RequestType", new AttributeValue().withS("restroom"));
+    private PutItemRequest requestPutItemRequest = new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0"));
     private String serial;
     private GroveDigitalIn digitalIn2;
     private GroveDigitalOut digitalOut3;
@@ -57,14 +58,6 @@ public class PirSensor extends TimerTask {
         digitalOut4 = new GrovePi4J().getDigitalOut(4);
     }
 
-    public Map<String, AttributeValue> getItem() {
-       return amazonDynamoDB.getItem(new GetItemRequest().withTableName("Request").addKeyEntry("RequestType", new AttributeValue().withS("restroom"))).getItem();
-    }
-
-    public void putItem() {
-        amazonDynamoDB.putItem(new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0")));
-    }
-
     @Override
     public void run() {
         try {
@@ -73,10 +66,10 @@ public class PirSensor extends TimerTask {
             digitalOut3.set(b);
             int request = 0;
             if (b) {
-                request = Integer.valueOf(getItem().get("Request").getN());
+                request = Integer.valueOf(amazonDynamoDB.getItem(requestGetItemRequest).getItem().get("Request").getN());
                 digitalOut4.set(BooleanUtils.toBoolean(request));
             } else {
-                putItem();
+                amazonDynamoDB.putItem(requestPutItemRequest);
                 digitalOut4.set(false);
             }
             String publishMessage = new JSONObject()
