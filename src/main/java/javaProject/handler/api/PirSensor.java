@@ -44,14 +44,21 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         ScanResult scanResult = amazonDynamoDB.scan(new ScanRequest().withTableName("Sensor"));
         logger.log(scanResult.toString());
         Stream<String> sensorIds = scanResult.getItems().stream().map(item -> item.get("SensorId").getS());
-        List<Map<String, AttributeValue>> pirSensor = sensorIds.map(sensorId -> {
+        List<JSONObject> pirSensor = sensorIds.map(sensorId -> {
             Map<String, AttributeValue> values = new HashMap<>();
             values.put(":s", new AttributeValue().withS(sensorId));
             QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").withExpressionAttributeValues(values).withLimit(limit).withScanIndexForward(false);
             QueryResult queryResult = amazonDynamoDB.query(queryRequest);
-            return queryResult.getItems();
-        }).flatMap(m -> m.stream()).distinct().collect(Collectors.toList());
-        logger.log("pirSensor" + pirSensor);
+
+            Stream<JSONObject> jsonObjectStream = queryResult.getItems().stream().map(m -> {
+                JSONObject j = new JSONObject().put("SensorId", m.get("SensorId").getS()).put("CreateAt", Long.valueOf(m.get("CreateAt").getN()));
+
+                return j;
+            });
+            return jsonObjectStream;
+            //return queryResult.getItems();
+        }).flatMap(m -> m).distinct().collect(Collectors.toList());
+        logger.log("pirSensor: " + pirSensor);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
