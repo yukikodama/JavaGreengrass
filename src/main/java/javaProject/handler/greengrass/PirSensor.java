@@ -3,11 +3,11 @@ package javaProject.handler.greengrass;
 import com.amazonaws.greengrass.javasdk.IotDataClient;
 import com.amazonaws.greengrass.javasdk.model.PublishRequest;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import org.apache.commons.lang3.BooleanUtils;
 import org.iot.raspberry.grovepi.GroveDigitalIn;
@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -31,9 +32,8 @@ public class PirSensor extends TimerTask {
     private static final String CPUINFO = "/proc/cpuinfo";
 
     private IotDataClient iotDataClient = new IotDataClient();
-    private Table table = new DynamoDB(AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build()).getTable("Request");
+    private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
     private String serial;
-
     private GroveDigitalIn digitalIn2;
     private GroveDigitalOut digitalOut3;
     private GroveDigitalOut digitalOut4;
@@ -57,12 +57,12 @@ public class PirSensor extends TimerTask {
         digitalOut4 = new GrovePi4J().getDigitalOut(4);
     }
 
-    public Item getItem() {
-        return table.getItem(new GetItemSpec().withPrimaryKey("RequestType", "restroom"));
+    public Map<String, AttributeValue> getItem() {
+       return amazonDynamoDB.getItem(new GetItemRequest().withTableName("Request").addKeyEntry("RequestType", new AttributeValue().withS("restroom"))).getItem();
     }
 
     public void putItem() {
-        table.putItem(new Item().withPrimaryKey("RequestType", "restroom").withInt("Request", 0));
+        amazonDynamoDB.putItem(new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0")));
     }
 
     @Override
@@ -73,7 +73,7 @@ public class PirSensor extends TimerTask {
             digitalOut3.set(b);
             int request = 0;
             if (b) {
-                request = ((java.math.BigDecimal) getItem().get("Request")).intValue();
+                request = Integer.valueOf(getItem().get("Request").getN());
                 digitalOut4.set(BooleanUtils.toBoolean(request));
             } else {
                 putItem();
@@ -83,8 +83,10 @@ public class PirSensor extends TimerTask {
                     .put("SensorId", serial)
                     .put("Pir", BooleanUtils.toInteger(b))
                     .put("During", 10 * count++)
+                    .put("Light", 0)
                     .put("CreateAt", createAt)
                     .put("UpdateAt", updateAt)
+                    .put("TTL", updateAt / 1000)
                     .put("Request", request).toString();
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {

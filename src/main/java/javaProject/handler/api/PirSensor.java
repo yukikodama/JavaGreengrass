@@ -3,6 +3,7 @@ package javaProject.handler.api;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
@@ -50,14 +51,13 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         logger.log("context: " + context);
 
         if ("POST".equals(event.getHttpMethod().toUpperCase())) {
-
+            PutItemRequest putItemRequest = new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("1"));
+            amazonDynamoDB.putItem(putItemRequest);
         }
 
         ScanResult scanResult = amazonDynamoDB.scan(sensorScanRequest);
         Stream<String> sensorIds = scanResult.getItems().stream().map(item -> item.get("SensorId").getS());
         List<JSONObject> pirSensor = sensorIds.map(sensorId -> {
-            //Map<String, AttributeValue> values = new HashMap<>();
-            //values.put(":s", new AttributeValue().withS(sensorId));
             QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false);
             QueryResult queryResult = amazonDynamoDB.query(queryRequest);
             return queryResult.getItems().stream().map(m -> this.createJSONObject(m));
