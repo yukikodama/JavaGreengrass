@@ -56,6 +56,7 @@ public class PirSensor extends TimerTask {
         digitalIn2 = new GrovePi4J().getDigitalIn(2);
         digitalOut3 = new GrovePi4J().getDigitalOut(3);
         digitalOut4 = new GrovePi4J().getDigitalOut(4);
+        amazonDynamoDB.putItem(new PutItemRequest().withTableName("Sensor").addItemEntry("SensorId", new AttributeValue().withS(serial)));
     }
 
     @Override
