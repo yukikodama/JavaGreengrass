@@ -9,6 +9,7 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -23,16 +24,23 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
 
     int getLimit(APIGatewayProxyRequestEvent event) {
-        int limit = 1;
         try {
-            limit = Integer.valueOf(event.getQueryStringParameters().get("limit"));
-            if (limit <= 0 || 60 < limit ) {
-                limit = 1;
-            }
+            int limit = Integer.valueOf(event.getQueryStringParameters().get("limit"));
+            return (limit <= 0 || 60 < limit ) ? 1 : limit;
         } catch (Exception e) {
-            logger.log(e.getMessage());
+            return 1;
         }
-        return limit;
+    }
+
+    JSONObject createJSONObject(Map<String, AttributeValue> m) {
+        return new JSONObject()
+                .put("SensorId", m.get("SensorId").getS())
+                .put("CreateAt", Long.valueOf(m.get("CreateAt").getN()))
+                .put("UpdateAt", Long.valueOf(m.get("UpdateAt").getN()))
+                .put("Pir", Integer.valueOf(m.get("Pir").getN()))
+                .put("Light", Integer.valueOf(m.get("Light").getN()))
+                .put("During", Integer.valueOf(m.get("During").getN()))
+                .put("TTL", Integer.valueOf(m.get("TTL").getN()));
     }
 
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent event, final Context context) {
@@ -40,29 +48,19 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         logger.log("event: " + event);
         logger.log("context: " + context);
 
-        int limit = this.getLimit(event);
         ScanResult scanResult = amazonDynamoDB.scan(new ScanRequest().withTableName("Sensor"));
-        logger.log(scanResult.toString());
         Stream<String> sensorIds = scanResult.getItems().stream().map(item -> item.get("SensorId").getS());
         List<JSONObject> pirSensor = sensorIds.map(sensorId -> {
             Map<String, AttributeValue> values = new HashMap<>();
             values.put(":s", new AttributeValue().withS(sensorId));
-            QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").withExpressionAttributeValues(values).withLimit(limit).withScanIndexForward(false);
+            QueryRequest queryRequest = new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").withExpressionAttributeValues(values).withLimit(this.getLimit(event)).withScanIndexForward(false);
             QueryResult queryResult = amazonDynamoDB.query(queryRequest);
-
-            Stream<JSONObject> jsonObjectStream = queryResult.getItems().stream().map(m -> {
-                JSONObject j = new JSONObject().put("SensorId", m.get("SensorId").getS()).put("CreateAt", Long.valueOf(m.get("CreateAt").getN()));
-
-                return j;
-            });
-            return jsonObjectStream;
-            //return queryResult.getItems();
-        }).flatMap(m -> m).distinct().collect(Collectors.toList());
-        logger.log("pirSensor: " + pirSensor);
+            return queryResult.getItems().stream().map(m -> this.createJSONObject(m));
+        }).flatMap(m -> m).peek(System.out::println).distinct().collect(Collectors.toList());
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         headers.put("Access-Control-Allow-Origin", "*");
-        return new APIGatewayProxyResponseEvent().withStatusCode(200).withHeaders(headers).withBody(new JSONObject().put("Output", "Hello Pir Sensor!").toString());
+        return new APIGatewayProxyResponseEvent().withStatusCode(200).withHeaders(headers).withBody(new JSONArray().put(pirSensor).toString());
     }
 }
