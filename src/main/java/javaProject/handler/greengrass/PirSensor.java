@@ -12,6 +12,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import org.apache.commons.lang3.BooleanUtils;
 import org.iot.raspberry.grovepi.GroveDigitalIn;
 import org.iot.raspberry.grovepi.GroveDigitalOut;
+import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 import org.json.JSONObject;
 
@@ -53,9 +54,10 @@ public class PirSensor extends TimerTask {
         Matcher m = Pattern.compile("Serial\\s+:\\s+(\\w{16})").matcher(new String(Files.readAllBytes(Paths.get(CPUINFO))));
         serial = m.find() ? m.group(1) : "none";
         createAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
-        digitalIn2 = new GrovePi4J().getDigitalIn(2);
-        digitalOut3 = new GrovePi4J().getDigitalOut(3);
-        digitalOut4 = new GrovePi4J().getDigitalOut(4);
+        GrovePi grovepi = new GrovePi4J();
+        digitalIn2 = grovepi.getDigitalIn(2);
+        digitalOut3 = grovepi.getDigitalOut(3);
+        digitalOut4 = grovepi.getDigitalOut(4);
         amazonDynamoDB.putItem(new PutItemRequest().withTableName("Sensor").addItemEntry("SensorId", new AttributeValue().withS(serial)));
     }
 
