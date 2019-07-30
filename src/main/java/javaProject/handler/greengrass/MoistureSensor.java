@@ -66,6 +66,7 @@ public class MoistureSensor extends TimerTask {
                     .put("Moisture", this.getAnalogValue(analogIn2.get()))
                     .put("Temperature", (int)dht.getTemperature())
                     .put("Humidity", (int)dht.getHumidity())
+                    .put("TTL", updateAt / 1000)
                     .toString();
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {

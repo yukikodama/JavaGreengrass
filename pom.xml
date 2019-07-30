@@ -123,7 +123,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>javaProject.main.GrovePiBlinkingLed</mainClass>
+                            <mainClass>javaProject.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
