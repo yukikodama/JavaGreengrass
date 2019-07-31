@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MoistureSensor extends TimerTask {
-    private static final String TOPIC = "topic/moistureSensor";
+    private static final String TOPIC = "topic/moisturesensor";
     private static final String CPUINFO = "/proc/cpuinfo";
 
     private IotDataClient iotDataClient = new IotDataClient();

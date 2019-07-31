@@ -13,6 +13,8 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.iot.raspberry.grovepi.GroveDigitalIn;
 import org.iot.raspberry.grovepi.GroveDigitalOut;
 import org.iot.raspberry.grovepi.GrovePi;
+import org.iot.raspberry.grovepi.devices.GroveLightSensor;
+import org.iot.raspberry.grovepi.devices.GroveSoundSensor;
 import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 import org.json.JSONObject;
 
@@ -36,6 +38,8 @@ public class PirSensor extends TimerTask {
     private GetItemRequest requestGetItemRequest = new GetItemRequest().withTableName("Request").addKeyEntry("RequestType", new AttributeValue().withS("restroom"));
     private PutItemRequest requestPutItemRequest = new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0"));
     private String serial;
+    private GroveLightSensor lightSensor0;
+    private GroveSoundSensor soundSensor1;
     private GroveDigitalIn digitalIn2;
     private GroveDigitalOut digitalOut3;
     private GroveDigitalOut digitalOut4;
@@ -55,6 +59,8 @@ public class PirSensor extends TimerTask {
         serial = m.find() ? m.group(1) : "none";
         createAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
         GrovePi grovepi = new GrovePi4J();
+        lightSensor0 = new GroveLightSensor(grovepi, 0);
+        soundSensor1 = new GroveSoundSensor(grovepi, 1);
         digitalIn2 = grovepi.getDigitalIn(2);
         digitalOut3 = grovepi.getDigitalOut(3);
         digitalOut4 = grovepi.getDigitalOut(4);
@@ -65,6 +71,8 @@ public class PirSensor extends TimerTask {
     public void run() {
         try {
             long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
+            lightSensor0.get();
+            soundSensor1.get();
             boolean b = digitalIn2.get();
             digitalOut3.set(b);
             int request = 0;
@@ -79,7 +87,8 @@ public class PirSensor extends TimerTask {
                     .put("SensorId", serial)
                     .put("Pir", BooleanUtils.toInteger(b))
                     .put("During", 10 * count++)
-                    .put("Light", 0)
+                    .put("Light", lightSensor0.get().intValue())
+                    .put("Sound", soundSensor1.get().intValue())
                     .put("CreateAt", createAt)
                     .put("UpdateAt", updateAt)
                     .put("TTL", updateAt / 1000)
