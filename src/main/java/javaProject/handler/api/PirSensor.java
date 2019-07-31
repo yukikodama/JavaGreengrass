@@ -31,6 +31,10 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         headers.put("Access-Control-Allow-Origin", "*");
     }
 
+    protected void postExecute() {
+        amazonDynamoDB.putItem(new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("1")));
+    }
+
     int getLimit(final APIGatewayProxyRequestEvent event) {
         try {
             int limit = Integer.valueOf(event.getQueryStringParameters().get("limit"));
@@ -40,7 +44,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         }
     }
 
-    JSONObject createJSONObject(final Map<String, AttributeValue> m) {
+    protected JSONObject createJSONObject(final Map<String, AttributeValue> m) {
         return new JSONObject()
                 .put("SensorId", m.get("SensorId").getS())
                 .put("CreateAt", Long.valueOf(m.get("CreateAt").getN()))
@@ -57,7 +61,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         logger.log("context: " + context);
 
         if ("POST".equals(event.getHttpMethod().toUpperCase())) {
-            amazonDynamoDB.putItem(new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("1")));
+            postExecute();
         }
 
         ScanResult scanResult = amazonDynamoDB.scan(sensorScanRequest);

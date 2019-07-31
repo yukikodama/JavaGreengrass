@@ -48,6 +48,19 @@ Resources:
           Properties:
             Path: /pirSensor
             Method: post
+  GreengrassMoistureSensor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: javaProject.handler.greengrass.MoistureSensor::handleRequest
+      FunctionName: GreengrassMoistureSensor
+      Runtime: java8
+      Description: '(yuki-kodama Lambda Java8) GreengrassMoistureSensor Lambda in Java8.'
+      MemorySize: 128
+      Timeout: 60
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
   GreengrassPirSensor:
     Type: AWS::Serverless::Function
     Properties:
