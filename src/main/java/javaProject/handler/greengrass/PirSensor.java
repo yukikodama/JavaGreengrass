@@ -71,8 +71,6 @@ public class PirSensor extends TimerTask {
     public void run() {
         try {
             long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
-            lightSensor0.get();
-            soundSensor1.get();
             boolean b = digitalIn2.get();
             digitalOut3.set(b);
             int request = 0;
@@ -86,7 +84,7 @@ public class PirSensor extends TimerTask {
             String publishMessage = new JSONObject()
                     .put("SensorId", serial)
                     .put("Pir", BooleanUtils.toInteger(b))
-                    .put("During", 10 * count++)
+                    .put("During", count++)
                     .put("Light", lightSensor0.get().intValue())
                     .put("Sound", soundSensor1.get().intValue())
                     .put("CreateAt", createAt)
