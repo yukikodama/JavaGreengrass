@@ -24,6 +24,58 @@ Globals:
       Role: !Ref CodeDeployRole
 
 Resources:
+  DynamoDBTableJavaGreengrassRequest:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: JavaGreengrassRequest
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        -
+          AttributeName: RequestType
+          AttributeType: S
+      KeySchema:
+        -
+          AttributeName: RequestType
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+  DynamoDBTableJavaGreengrassSensor:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: JavaGreengrassSensor
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        -
+          AttributeName: SensorId
+          AttributeType: S
+      KeySchema:
+        -
+          AttributeName: SensorId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+  DynamoDBTableJavaGreengrassPirSensor:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: JavaGreengrassPirSensor
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        -
+          AttributeName: SensorId
+          AttributeType: S
+        -
+          AttributeName: UpdateAt
+          AttributeType: N
+      KeySchema:
+        -
+          AttributeName: SensorId
+          KeyType: HASH
+        -
+          AttributeName: UpdateAt
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
   ApiPirSensor:
     Type: AWS::Serverless::Function
     Properties:
