@@ -78,7 +78,7 @@ Resources:
   DynamoDBTableJavaGreengrassMoistureSensor:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: JavaGreengrassPirSensor
+      TableName: JavaGreengrassMoistureSensor
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         -
