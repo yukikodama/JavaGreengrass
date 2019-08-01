@@ -35,8 +35,8 @@ public class PirSensor extends TimerTask {
 
     private IotDataClient iotDataClient = new IotDataClient();
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
-    private GetItemRequest requestGetItemRequest = new GetItemRequest().withTableName("Request").addKeyEntry("RequestType", new AttributeValue().withS("restroom"));
-    private PutItemRequest requestPutItemRequest = new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0"));
+    private GetItemRequest requestGetItemRequest = new GetItemRequest().withTableName("JavaGreengrassRequest").addKeyEntry("RequestType", new AttributeValue().withS("restroom"));
+    private PutItemRequest requestPutItemRequest = new PutItemRequest().withTableName("JavaGreengrassRequest").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0"));
     private String serial;
     private GroveLightSensor lightSensor0;
     private GroveSoundSensor soundSensor1;
@@ -64,7 +64,7 @@ public class PirSensor extends TimerTask {
         digitalIn2 = grovepi.getDigitalIn(2);
         digitalOut3 = grovepi.getDigitalOut(3);
         digitalOut4 = grovepi.getDigitalOut(4);
-        amazonDynamoDB.putItem(new PutItemRequest().withTableName("Sensor").addItemEntry("SensorId", new AttributeValue().withS(serial)));
+        amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassSensor").addItemEntry("SensorId", new AttributeValue().withS(serial)));
     }
 
     @Override

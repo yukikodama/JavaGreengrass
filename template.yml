@@ -75,7 +75,27 @@ Resources:
           KeyType: RANGE
       StreamSpecification:
         StreamViewType: NEW_IMAGE
-
+  DynamoDBTableJavaGreengrassMoistureSensor:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: JavaGreengrassPirSensor
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        -
+          AttributeName: SensorId
+          AttributeType: S
+        -
+          AttributeName: UpdateAt
+          AttributeType: N
+      KeySchema:
+        -
+          AttributeName: SensorId
+          KeyType: HASH
+        -
+          AttributeName: UpdateAt
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
   ApiPirSensor:
     Type: AWS::Serverless::Function
     Properties:

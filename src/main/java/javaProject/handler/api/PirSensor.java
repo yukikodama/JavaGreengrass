@@ -22,7 +22,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
     static LambdaLogger logger = null;
 
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
-    private ScanRequest sensorScanRequest = new ScanRequest().withTableName("Sensor");
+    private ScanRequest sensorScanRequest = new ScanRequest().withTableName("JavaGreengrassSensor");
 
     protected Map<String, String> headers = new HashMap<>();
 
@@ -32,7 +32,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
     }
 
     protected void postExecute() {
-        amazonDynamoDB.putItem(new PutItemRequest().withTableName("Request").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("1")));
+        amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassRequest").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("1")));
     }
 
     int getLimit(final APIGatewayProxyRequestEvent event) {
@@ -66,7 +66,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
 
         ScanResult scanResult = amazonDynamoDB.scan(sensorScanRequest);
         List<JSONObject> pirSensor = scanResult.getItems().stream().map(item -> item.get("SensorId").getS()).map(sensorId -> {
-            QueryResult queryResult = amazonDynamoDB.query(new QueryRequest().withTableName("PirSensor").withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false));
+            QueryResult queryResult = amazonDynamoDB.query(new QueryRequest().withTableName("JavaGreengrassPirSensor").withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false));
             return queryResult.getItems().stream().map(m -> this.createJSONObject(m));
         }).flatMap(m -> m).peek(System.out::println).distinct().collect(Collectors.toList());
 
