@@ -64,7 +64,7 @@ public class PirSensor extends TimerTask {
         digitalIn2 = grovepi.getDigitalIn(2);
         digitalOut3 = grovepi.getDigitalOut(3);
         digitalOut4 = grovepi.getDigitalOut(4);
-        amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassSensor").addItemEntry("SensorId", new AttributeValue().withS(serial)));
+        amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassSensorType").addItemEntry("SensorType", new AttributeValue().withS("pir")).addItemEntry("SensorId", new AttributeValue().withS(serial)).addItemEntry("Uses", new AttributeValue().withS(getSystemEnv("USES"))));
     }
 
     @Override
@@ -113,5 +113,9 @@ public class PirSensor extends TimerTask {
 
     public String handleRequest(Object input, Context context) {
         return "ok";
+    }
+
+    protected String getSystemEnv(String name) {
+        return System.getenv(name);
     }
 }

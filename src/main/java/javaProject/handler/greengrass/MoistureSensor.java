@@ -54,6 +54,7 @@ public class MoistureSensor extends TimerTask {
         grovepi = new GrovePi4J();
         analogIn2 = grovepi.getAnalogIn(2, 4);
         dht2 = new GroveTemperatureAndHumiditySensor(grovepi, 2, GroveTemperatureAndHumiditySensor.Type.DHT11);
+        amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassSensorType").addItemEntry("SensorType", new AttributeValue().withS("moisture")).addItemEntry("SensorId", new AttributeValue().withS(serial)).addItemEntry("Uses", new AttributeValue().withS("")));
     }
 
     @Override
