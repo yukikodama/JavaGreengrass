@@ -22,7 +22,6 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
     static LambdaLogger logger = null;
 
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
-    private ScanRequest sensorScanRequest = new ScanRequest().withTableName("JavaGreengrassSensor");
     protected Map<String, String> headers = new HashMap<>();
 
     public PirSensor() {
@@ -56,6 +55,10 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
                 .put("Request", Integer.valueOf(m.get("Request").getN()));
     }
 
+    protected QueryRequest createQueryRequest() {
+        return new QueryRequest().withTableName("JavaGreengrassSensorType").withKeyConditionExpression("SensorType = :t").addExpressionAttributeValuesEntry(":t", new AttributeValue().withS("pir"));
+    }
+
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent event, final Context context) {
         logger = context.getLogger();
         logger.log("event: " + event);
@@ -64,9 +67,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         if ("POST".equals(event.getHttpMethod().toUpperCase())) {
             postExecute();
         }
-
-        ScanResult scanResult = amazonDynamoDB.scan(sensorScanRequest);
-        List<JSONObject> pirSensor = scanResult.getItems().stream().map(item -> item.get("SensorId").getS()).map(sensorId -> {
+        List<JSONObject> pirSensor = amazonDynamoDB.query(createQueryRequest()).getItems().stream().map(item -> item.get("SensorId").getS()).map(sensorId -> {
             QueryResult queryResult = amazonDynamoDB.query(new QueryRequest().withTableName("JavaGreengrassPirSensor").withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false));
             return queryResult.getItems().stream().map(m -> this.createJSONObject(m));
         }).flatMap(m -> m).peek(System.out::println).distinct().collect(Collectors.toList());

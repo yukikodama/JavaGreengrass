@@ -97,7 +97,7 @@ Resources:
           KeyType: RANGE
       StreamSpecification:
         StreamViewType: NEW_IMAGE
-      TimeToLiveSpecification: TTL
+      #TimeToLiveSpecification: TTL
   DynamoDBTableJavaGreengrassMoistureSensor:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -119,7 +119,7 @@ Resources:
           KeyType: RANGE
       StreamSpecification:
         StreamViewType: NEW_IMAGE
-      TimeToLiveSpecification: TTL
+      #TimeToLiveSpecification: TTL
   ApiPirSensor:
     Type: AWS::Serverless::Function
     Properties:
