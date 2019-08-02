@@ -83,12 +83,12 @@ public class PirSensor extends TimerTask {
             }
             String publishMessage = new JSONObject()
                     .put("SensorId", serial)
-                    .put("Pir", BooleanUtils.toInteger(b))
-                    .put("During", count++)
-                    .put("Light", lightSensor0.get().intValue())
-                    .put("Sound", soundSensor1.get().intValue())
                     .put("CreateAt", createAt)
                     .put("UpdateAt", updateAt)
+                    .put("Pir", BooleanUtils.toInteger(b))
+                    .put("Light", lightSensor0.get().intValue())
+                    .put("Sound", soundSensor1.get().intValue())
+                    .put("During", count++)
                     .put("TTL", updateAt / 1000)
                     .put("Request", request).toString();
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));

@@ -51,8 +51,10 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
                 .put("UpdateAt", Long.valueOf(m.get("UpdateAt").getN()))
                 .put("Pir", Integer.valueOf(m.get("Pir").getN()))
                 .put("Light", Integer.valueOf(m.get("Light").getN()))
+                .put("Sound", Integer.valueOf(m.get("Sound").getN()))
                 .put("During", Integer.valueOf(m.get("During").getN()))
-                .put("TTL", Integer.valueOf(m.get("TTL").getN()));
+                .put("TTL", Integer.valueOf(m.get("TTL").getN()))
+                .put("Request", Integer.valueOf(m.get("Request").getN()));
     }
 
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent event, final Context context) {
