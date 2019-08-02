@@ -5,6 +5,8 @@ import com.amazonaws.greengrass.javasdk.model.PublishRequest;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import org.iot.raspberry.grovepi.GroveAnalogIn;
 import org.iot.raspberry.grovepi.GrovePi;
@@ -59,15 +61,28 @@ public class MoistureSensor extends TimerTask {
         try {
             long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
             GroveTemperatureAndHumidityValue dht = dht2.get();
+            int moisture = this.getAnalogValue(analogIn2.get());
+            int temperature = (int)dht.getTemperature();
+            int humidity = (int)dht.getHumidity();
             String publishMessage = new JSONObject()
                     .put("SensorId", serial)
                     .put("CreateAt", createAt)
                     .put("UpdateAt", updateAt)
-                    .put("Moisture", this.getAnalogValue(analogIn2.get()))
-                    .put("Temperature", (int)dht.getTemperature())
-                    .put("Humidity", (int)dht.getHumidity())
+                    .put("Moisture", moisture)
+                    .put("Temperature", temperature)
+                    .put("Humidity", humidity)
                     .put("TTL", updateAt / 1000)
                     .toString();
+            amazonDynamoDB.putItem(new PutItemRequest()
+                    .withTableName("JavaGreengrassMoistureSensor")
+                    .addItemEntry("SensorId", new AttributeValue().withS(serial))
+                    .addItemEntry("CreateAt", new AttributeValue().withN(String.valueOf(createAt)))
+                    .addItemEntry("UpdateAt", new AttributeValue().withN(String.valueOf(updateAt)))
+                    .addItemEntry("Moisture", new AttributeValue().withN(String.valueOf(moisture)))
+                    .addItemEntry("Temperature", new AttributeValue().withN(String.valueOf(temperature)))
+                    .addItemEntry("Humidity", new AttributeValue().withN(String.valueOf(humidity)))
+                    .addItemEntry("TTL", new AttributeValue().withN(String.valueOf(updateAt / 1000)))
+            );
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
             System.err.println(ex);

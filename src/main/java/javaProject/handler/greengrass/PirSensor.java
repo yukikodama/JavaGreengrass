@@ -73,6 +73,8 @@ public class PirSensor extends TimerTask {
             long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
             boolean b = digitalIn2.get();
             digitalOut3.set(b);
+            int light = lightSensor0.get().intValue();
+            int sound = soundSensor1.get().intValue();
             int request = 0;
             if (b) {
                 request = Integer.valueOf(amazonDynamoDB.getItem(requestGetItemRequest).getItem().get("Request").getN());
@@ -86,11 +88,23 @@ public class PirSensor extends TimerTask {
                     .put("CreateAt", createAt)
                     .put("UpdateAt", updateAt)
                     .put("Pir", BooleanUtils.toInteger(b))
-                    .put("Light", lightSensor0.get().intValue())
-                    .put("Sound", soundSensor1.get().intValue())
-                    .put("During", count++)
+                    .put("Light", light)
+                    .put("Sound", sound)
+                    .put("During", count)
                     .put("TTL", updateAt / 1000)
                     .put("Request", request).toString();
+            amazonDynamoDB.putItem(new PutItemRequest()
+                    .withTableName("JavaGreengrassPirSensor")
+                    .addItemEntry("SensorId", new AttributeValue().withS(serial))
+                    .addItemEntry("CreateAt", new AttributeValue().withN(String.valueOf(createAt)))
+                    .addItemEntry("UpdateAt", new AttributeValue().withN(String.valueOf(updateAt)))
+                    .addItemEntry("Pir", new AttributeValue().withN(String.valueOf(BooleanUtils.toInteger(b))))
+                    .addItemEntry("Light", new AttributeValue().withN(String.valueOf(light)))
+                    .addItemEntry("Sound", new AttributeValue().withN(String.valueOf(sound)))
+                    .addItemEntry("During", new AttributeValue().withN(String.valueOf(count++)))
+                    .addItemEntry("TTL", new AttributeValue().withN(String.valueOf(updateAt / 1000)))
+                    .addItemEntry("Request", new AttributeValue().withN(String.valueOf(request)))
+            );
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
             System.err.println(ex);
