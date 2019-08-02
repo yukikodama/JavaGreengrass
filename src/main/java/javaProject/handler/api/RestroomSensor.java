@@ -1,0 +1,15 @@
+package javaProject.handler.api;
+
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import org.json.JSONObject;
+
+import java.util.Map;
+
+public class RestroomSensor extends PirSensor {
+    protected JSONObject createJSONObject(final Map<String, AttributeValue> m) {
+        return new JSONObject()
+                .put("SensorId", m.get("SensorId").getS())
+                .put("UpdateAt", Long.valueOf(m.get("UpdateAt").getN()))
+                .put("Pir", Integer.valueOf(m.get("Pir").getN()));
+    }
+}

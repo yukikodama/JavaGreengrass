@@ -23,7 +23,6 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
 
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
     private ScanRequest sensorScanRequest = new ScanRequest().withTableName("JavaGreengrassSensor");
-
     protected Map<String, String> headers = new HashMap<>();
 
     public PirSensor() {
