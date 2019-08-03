@@ -8,7 +8,10 @@ import java.util.Map;
 
 public class RestroomSensor extends PirSensor {
     protected QueryRequest createQueryRequest() {
-        return new QueryRequest().withTableName("JavaGreengrassSensorType").withKeyConditionExpression("SensorType = :t").addExpressionAttributeValuesEntry(":t", new AttributeValue().withS("pir"));
+        return new QueryRequest().withTableName("JavaGreengrassSensorType")
+                .withKeyConditionExpression("SensorType = :t and Uses = :u")
+                .addExpressionAttributeValuesEntry(":t", new AttributeValue().withS("pir"))
+                .addExpressionAttributeValuesEntry(":u", new AttributeValue().withS("restroom"));
     }
 
     protected JSONObject createJSONObject(final Map<String, AttributeValue> m) {
