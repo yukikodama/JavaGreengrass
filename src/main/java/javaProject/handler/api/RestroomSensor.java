@@ -2,11 +2,17 @@ package javaProject.handler.api;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import org.json.JSONObject;
 
 import java.util.Map;
 
 public class RestroomSensor extends PirSensor {
+
+    protected int getLimit(final APIGatewayProxyRequestEvent event) {
+        return 1;
+    }
+
     protected QueryRequest createQueryRequest() {
         return new QueryRequest().withTableName("JavaGreengrassSensorType")
                 .withKeyConditionExpression("SensorType = :t ")

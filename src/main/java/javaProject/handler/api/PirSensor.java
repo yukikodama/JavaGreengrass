@@ -35,7 +35,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassRequest").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("1")));
     }
 
-    int getLimit(final APIGatewayProxyRequestEvent event) {
+    protected int getLimit(final APIGatewayProxyRequestEvent event) {
         try {
             int limit = Integer.valueOf(event.getQueryStringParameters().get("limit"));
             return (limit <= 0 || 60 < limit) ? 1 : limit;
