@@ -91,7 +91,7 @@ public class PirSensor extends TimerTask {
                     .put("Light", light)
                     .put("Sound", sound)
                     .put("During", count)
-                    .put("TTL", updateAt / 1000)
+                    .put("TTL", (updateAt / 1000) + 900)
                     .put("Request", request).toString();
             amazonDynamoDB.putItem(new PutItemRequest()
                     .withTableName("JavaGreengrassPirSensor")
@@ -102,7 +102,7 @@ public class PirSensor extends TimerTask {
                     .addItemEntry("Light", new AttributeValue().withN(String.valueOf(light)))
                     .addItemEntry("Sound", new AttributeValue().withN(String.valueOf(sound)))
                     .addItemEntry("During", new AttributeValue().withN(String.valueOf(count++)))
-                    .addItemEntry("TTL", new AttributeValue().withN(String.valueOf(updateAt / 1000)))
+                    .addItemEntry("TTL", new AttributeValue().withN(String.valueOf((updateAt / 1000) + 900)))
                     .addItemEntry("Request", new AttributeValue().withN(String.valueOf(request)))
             );
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));

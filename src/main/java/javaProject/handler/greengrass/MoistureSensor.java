@@ -72,7 +72,7 @@ public class MoistureSensor extends TimerTask {
                     .put("Moisture", moisture)
                     .put("Temperature", temperature)
                     .put("Humidity", humidity)
-                    .put("TTL", updateAt / 1000)
+                    .put("TTL", (updateAt / 1000) + 900)
                     .toString();
             amazonDynamoDB.putItem(new PutItemRequest()
                     .withTableName("JavaGreengrassMoistureSensor")
@@ -82,7 +82,7 @@ public class MoistureSensor extends TimerTask {
                     .addItemEntry("Moisture", new AttributeValue().withN(String.valueOf(moisture)))
                     .addItemEntry("Temperature", new AttributeValue().withN(String.valueOf(temperature)))
                     .addItemEntry("Humidity", new AttributeValue().withN(String.valueOf(humidity)))
-                    .addItemEntry("TTL", new AttributeValue().withN(String.valueOf(updateAt / 1000)))
+                    .addItemEntry("TTL", new AttributeValue().withN(String.valueOf((updateAt / 1000) + 900)))
             );
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
