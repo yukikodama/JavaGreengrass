@@ -9,7 +9,8 @@ import java.util.Map;
 public class RestroomSensor extends PirSensor {
     protected QueryRequest createQueryRequest() {
         return new QueryRequest().withTableName("JavaGreengrassSensorType")
-                .withKeyConditionExpression("SensorType = :t and Uses = :u")
+                .withKeyConditionExpression("SensorType = :t ")
+                .withFilterExpression("Uses = :u")
                 .addExpressionAttributeValuesEntry(":t", new AttributeValue().withS("pir"))
                 .addExpressionAttributeValuesEntry(":u", new AttributeValue().withS("restroom"));
     }
