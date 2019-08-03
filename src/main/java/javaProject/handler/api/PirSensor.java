@@ -3,8 +3,10 @@ package javaProject.handler.api;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-
-import com.amazonaws.services.dynamodbv2.model.*;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -59,6 +61,10 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         return new QueryRequest().withTableName("JavaGreengrassSensorType").withKeyConditionExpression("SensorType = :t").addExpressionAttributeValuesEntry(":t", new AttributeValue().withS("pir"));
     }
 
+    protected String getSensorTableName() {
+        return "JavaGreengrassPirSensor";
+    }
+
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent event, final Context context) {
         logger = context.getLogger();
         logger.log("event: " + event);
@@ -68,7 +74,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
             postExecute();
         }
         List<JSONObject> pirSensor = amazonDynamoDB.query(createQueryRequest()).getItems().stream().map(item -> item.get("SensorId").getS()).map(sensorId -> {
-            QueryResult queryResult = amazonDynamoDB.query(new QueryRequest().withTableName("JavaGreengrassPirSensor").withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false));
+            QueryResult queryResult = amazonDynamoDB.query(new QueryRequest().withTableName(getSensorTableName()).withKeyConditionExpression("SensorId = :s").addExpressionAttributeValuesEntry(":s", new AttributeValue().withS(sensorId)).withLimit(this.getLimit(event)).withScanIndexForward(false));
             return queryResult.getItems().stream().map(m -> this.createJSONObject(m));
         }).flatMap(m -> m).peek(System.out::println).distinct().collect(Collectors.toList());
 
