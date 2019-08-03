@@ -40,7 +40,7 @@ public class PirSensor extends TimerTask {
     private String serial;
     private GroveLightSensor lightSensor0;
     private GroveSoundSensor soundSensor1;
-    private GroveDigitalIn digitalIn2;
+    private GroveDigitalIn digitalIn7;
     private GroveDigitalOut digitalOut3;
     private GroveDigitalOut digitalOut4;
     private int count = 0;
@@ -61,7 +61,7 @@ public class PirSensor extends TimerTask {
         GrovePi grovepi = new GrovePi4J();
         lightSensor0 = new GroveLightSensor(grovepi, 0);
         soundSensor1 = new GroveSoundSensor(grovepi, 1);
-        digitalIn2 = grovepi.getDigitalIn(2);
+        digitalIn7 = grovepi.getDigitalIn(7);
         digitalOut3 = grovepi.getDigitalOut(3);
         digitalOut4 = grovepi.getDigitalOut(4);
         amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassSensorType").addItemEntry("SensorType", new AttributeValue().withS("pir")).addItemEntry("SensorId", new AttributeValue().withS(serial)).addItemEntry("Uses", new AttributeValue().withS(getSystemEnv("USES"))));
@@ -71,7 +71,7 @@ public class PirSensor extends TimerTask {
     public void run() {
         try {
             long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
-            boolean b = digitalIn2.get();
+            boolean b = digitalIn7.get();
             digitalOut3.set(b);
             int light = lightSensor0.get().intValue();
             int sound = soundSensor1.get().intValue();
