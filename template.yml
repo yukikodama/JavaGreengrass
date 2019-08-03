@@ -39,21 +39,6 @@ Resources:
           KeyType: HASH
       StreamSpecification:
         StreamViewType: NEW_IMAGE
-  DynamoDBTableJavaGreengrassSensor:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: JavaGreengrassSensor
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        -
-          AttributeName: SensorId
-          AttributeType: S
-      KeySchema:
-        -
-          AttributeName: SensorId
-          KeyType: HASH
-      StreamSpecification:
-        StreamViewType: NEW_IMAGE
   DynamoDBTableJavaGreengrassSensorType:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -120,6 +105,30 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_IMAGE
       #TimeToLiveSpecification: TTL
+  ApiRestroomSensor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: javaProject.handler.api.RestroomSensor::handleRequest
+      # FunctionName: ApiRestroomSensor
+      Runtime: java8
+      Description: '(yuki-kodama Lambda Java8) ApiRestroomSensor Lambda in Java8.'
+      MemorySize: 256
+      Timeout: 30
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /restroom
+            Method: get
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /restroom
+            Method: post
   ApiPirSensor:
     Type: AWS::Serverless::Function
     Properties:
