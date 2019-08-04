@@ -7,15 +7,12 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
-import com.amazonaws.services.lambda.runtime.Context;
 import org.iot.raspberry.grovepi.GroveAnalogIn;
 import org.iot.raspberry.grovepi.GrovePi;
-import org.iot.raspberry.grovepi.GroveUtil;
 import org.iot.raspberry.grovepi.devices.GroveTemperatureAndHumiditySensor;
 import org.iot.raspberry.grovepi.devices.GroveTemperatureAndHumidityValue;
 import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 import org.json.JSONObject;
-
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -78,5 +75,4 @@ public class MoistureSensor extends BaseSensor {
             System.err.println(ex);
         }
     }
-
 }

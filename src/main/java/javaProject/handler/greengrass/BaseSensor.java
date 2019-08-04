@@ -2,7 +2,6 @@ package javaProject.handler.greengrass;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import org.iot.raspberry.grovepi.GroveUtil;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -25,6 +24,10 @@ public abstract class BaseSensor extends TimerTask {
     protected int getAnalogValue(byte[] value) {
         int[] i = GroveUtil.unsign(value);
         return (i[1] * 256) + i[2];
+    }
+
+    protected String getSystemEnv(String name) {
+        return System.getenv(name);
     }
 
     public String handleRequest(Object input, Context context) {

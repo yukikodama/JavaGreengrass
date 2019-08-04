@@ -8,7 +8,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
-import com.amazonaws.services.lambda.runtime.Context;
 import org.apache.commons.lang3.BooleanUtils;
 import org.iot.raspberry.grovepi.GroveDigitalIn;
 import org.iot.raspberry.grovepi.GroveDigitalOut;
@@ -17,34 +16,24 @@ import org.iot.raspberry.grovepi.devices.GroveLightSensor;
 import org.iot.raspberry.grovepi.devices.GroveSoundSensor;
 import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 import org.json.JSONObject;
-
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class PirSensor extends TimerTask {
+public class PirSensor extends BaseSensor {
     private static final String TOPIC = "topic/pirsensor";
-    private static final String CPUINFO = "/proc/cpuinfo";
 
     private IotDataClient iotDataClient = new IotDataClient();
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
     private GetItemRequest requestGetItemRequest = new GetItemRequest().withTableName("JavaGreengrassRequest").addKeyEntry("RequestType", new AttributeValue().withS("restroom"));
     private PutItemRequest requestPutItemRequest = new PutItemRequest().withTableName("JavaGreengrassRequest").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0"));
-    private String serial;
     private GroveLightSensor lightSensor0;
     private GroveSoundSensor soundSensor1;
     private GroveDigitalIn digitalIn7;
     private GroveDigitalOut digitalOut3;
     private GroveDigitalOut digitalOut4;
     private int count = 0;
-    private long createAt;
 
     static {
         try {
@@ -55,9 +44,6 @@ public class PirSensor extends TimerTask {
     }
 
     private PirSensor() throws Exception {
-        Matcher m = Pattern.compile("Serial\\s+:\\s+(\\w{16})").matcher(new String(Files.readAllBytes(Paths.get(CPUINFO))));
-        serial = m.find() ? m.group(1) : "none";
-        createAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
         GrovePi grovepi = new GrovePi4J();
         lightSensor0 = new GroveLightSensor(grovepi, 0);
         soundSensor1 = new GroveSoundSensor(grovepi, 1);
@@ -109,13 +95,5 @@ public class PirSensor extends TimerTask {
         } catch (Exception ex) {
             System.err.println(ex);
         }
-    }
-
-    public String handleRequest(Object input, Context context) {
-        return "ok";
-    }
-
-    protected String getSystemEnv(String name) {
-        return System.getenv(name);
     }
 }
