@@ -17,27 +17,19 @@ import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class MoistureSensor extends TimerTask {
+public class MoistureSensor extends BaseSensor {
     private static final String TOPIC = "topic/moisturesensor";
-    private static final String CPUINFO = "/proc/cpuinfo";
 
     private IotDataClient iotDataClient = new IotDataClient();
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
-    private String serial;
-    private GrovePi grovepi ;
+    private GrovePi grovepi;
     private GroveAnalogIn analogIn2;
     private GroveTemperatureAndHumiditySensor dht2;
 
-    private long createAt;
 
     static {
         try {
@@ -48,9 +40,6 @@ public class MoistureSensor extends TimerTask {
     }
 
     private MoistureSensor() throws Exception {
-        Matcher m = Pattern.compile("Serial\\s+:\\s+(\\w{16})").matcher(new String(Files.readAllBytes(Paths.get(CPUINFO))));
-        serial = m.find() ? m.group(1) : "none";
-        createAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
         grovepi = new GrovePi4J();
         analogIn2 = grovepi.getAnalogIn(2, 4);
         dht2 = new GroveTemperatureAndHumiditySensor(grovepi, 2, GroveTemperatureAndHumiditySensor.Type.DHT11);
@@ -63,8 +52,8 @@ public class MoistureSensor extends TimerTask {
             long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
             GroveTemperatureAndHumidityValue dht = dht2.get();
             int moisture = this.getAnalogValue(analogIn2.get());
-            int temperature = (int)dht.getTemperature();
-            int humidity = (int)dht.getHumidity();
+            int temperature = (int) dht.getTemperature();
+            int humidity = (int) dht.getHumidity();
             String publishMessage = new JSONObject()
                     .put("SensorId", serial)
                     .put("CreateAt", createAt)
@@ -90,12 +79,4 @@ public class MoistureSensor extends TimerTask {
         }
     }
 
-    private int getAnalogValue(byte[] value) {
-        int[] i = GroveUtil.unsign(value);
-        return (i[1] * 256) + i[2];
-    }
-
-    public String handleRequest(Object input, Context context) {
-        return "ok";
-    }
 }
