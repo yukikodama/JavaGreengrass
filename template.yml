@@ -105,6 +105,30 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_IMAGE
       #TimeToLiveSpecification: TTL
+  ApiMoistureSensor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: javaProject.handler.api.MoistureSensor::handleRequest
+      # FunctionName: ApiMoistureSensor
+      Runtime: java8
+      Description: '(yuki-kodama Lambda Java8) ApiMoistureSensor Lambda in Java8.'
+      MemorySize: 256
+      Timeout: 30
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /moisture
+            Method: get
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /moisture
+            Method: post
   ApiRestroomSensor:
     Type: AWS::Serverless::Function
     Properties:
