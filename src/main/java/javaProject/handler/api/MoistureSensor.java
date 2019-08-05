@@ -9,10 +9,6 @@ import java.util.Map;
 
 public class MoistureSensor extends PirSensor {
 
-    // protected int getLimit(final APIGatewayProxyRequestEvent event) {
-    //    return 1;
-    //}
-
     protected QueryRequest createQueryRequest() {
         return new QueryRequest().withTableName("JavaGreengrassSensorType")
                 .withKeyConditionExpression("SensorType = :t ")
@@ -30,5 +26,9 @@ public class MoistureSensor extends PirSensor {
                 .put("Temperature", Integer.valueOf(m.get("Moisture").getN()))
                 .put("Humidity", Integer.valueOf(m.get("Moisture").getN()))
                 .put("TTL", Integer.valueOf(m.get("TTL").getN()));
+    }
+
+    protected String getSensorTableName() {
+        return "JavaGreengrassMoistureSensor";
     }
 }
