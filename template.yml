@@ -177,6 +177,19 @@ Resources:
           Properties:
             Path: /pirSensor
             Method: post
+  GreengrassHelloWorldCounter:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: javaProject.handler.greengrass.HelloWorldCounter::handleRequest
+      FunctionName: GreengrassHelloWorldCounter
+      Runtime: java8
+      Description: '(yuki-kodama Lambda Java8) GreengrassHelloWorldCounter Lambda in Java8.'
+      MemorySize: 128
+      Timeout: 60
+      Role:
+        Fn::GetAtt:
+          - LambdaExecutionRole
+          - Arn
   GreengrassMoistureSensor:
     Type: AWS::Serverless::Function
     Properties:
