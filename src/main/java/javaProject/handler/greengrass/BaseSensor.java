@@ -1,5 +1,6 @@
 package javaProject.handler.greengrass;
 
+import com.amazonaws.greengrass.javasdk.IotDataClient;
 import com.amazonaws.services.lambda.runtime.Context;
 import org.iot.raspberry.grovepi.GroveUtil;
 import java.nio.file.Files;
@@ -12,6 +13,7 @@ import java.util.regex.Pattern;
 
 public abstract class BaseSensor extends TimerTask {
     private static final String CPUINFO = "/proc/cpuinfo";
+    protected IotDataClient iotDataClient = new IotDataClient();
     protected String serial;
     protected long createAt;
 
@@ -30,7 +32,7 @@ public abstract class BaseSensor extends TimerTask {
         return System.getenv(name);
     }
 
-    public String handleRequest(Object input, Context context) {
+    public String handleRequest(Object event, Context context) {
         return "ok";
     }
 }

@@ -24,7 +24,6 @@ import java.util.Timer;
 public class PirSensor extends BaseSensor {
     private static final String TOPIC = "topic/pirsensor";
 
-    private IotDataClient iotDataClient = new IotDataClient();
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
     private GetItemRequest requestGetItemRequest = new GetItemRequest().withTableName("JavaGreengrassRequest").addKeyEntry("RequestType", new AttributeValue().withS("restroom"));
     private PutItemRequest requestPutItemRequest = new PutItemRequest().withTableName("JavaGreengrassRequest").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0"));

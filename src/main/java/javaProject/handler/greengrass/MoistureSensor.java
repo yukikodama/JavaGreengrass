@@ -21,7 +21,7 @@ import java.util.Timer;
 public class MoistureSensor extends BaseSensor {
     private static final String TOPIC = "topic/moisturesensor";
 
-    private IotDataClient iotDataClient = new IotDataClient();
+
     private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
     private GrovePi grovepi;
     private GroveAnalogIn analogIn2;
