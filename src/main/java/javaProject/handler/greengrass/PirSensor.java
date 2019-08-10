@@ -1,6 +1,5 @@
 package javaProject.handler.greengrass;
 
-import com.amazonaws.greengrass.javasdk.IotDataClient;
 import com.amazonaws.greengrass.javasdk.model.PublishRequest;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -11,11 +10,10 @@ import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import org.apache.commons.lang3.BooleanUtils;
 import org.iot.raspberry.grovepi.GroveDigitalIn;
 import org.iot.raspberry.grovepi.GroveDigitalOut;
-import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.devices.GroveLightSensor;
 import org.iot.raspberry.grovepi.devices.GroveSoundSensor;
-import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
 import org.json.JSONObject;
+
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -43,7 +41,6 @@ public class PirSensor extends BaseSensor {
     }
 
     private PirSensor() throws Exception {
-        GrovePi grovepi = new GrovePi4J();
         lightSensor0 = new GroveLightSensor(grovepi, 0);
         soundSensor1 = new GroveSoundSensor(grovepi, 1);
         digitalIn7 = grovepi.getDigitalIn(7);

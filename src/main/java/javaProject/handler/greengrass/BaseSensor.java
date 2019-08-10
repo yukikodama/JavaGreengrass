@@ -2,7 +2,10 @@ package javaProject.handler.greengrass;
 
 import com.amazonaws.greengrass.javasdk.IotDataClient;
 import com.amazonaws.services.lambda.runtime.Context;
+import org.iot.raspberry.grovepi.GrovePi;
 import org.iot.raspberry.grovepi.GroveUtil;
+import org.iot.raspberry.grovepi.pi4j.GrovePi4J;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -14,6 +17,7 @@ import java.util.regex.Pattern;
 public abstract class BaseSensor extends TimerTask {
     private static final String CPUINFO = "/proc/cpuinfo";
     protected IotDataClient iotDataClient = new IotDataClient();
+    protected GrovePi grovepi;
     protected String serial;
     protected long createAt;
 
@@ -21,6 +25,7 @@ public abstract class BaseSensor extends TimerTask {
         Matcher m = Pattern.compile("Serial\\s+:\\s+(\\w{16})").matcher(new String(Files.readAllBytes(Paths.get(CPUINFO))));
         serial = m.find() ? m.group(1) : "none";
         createAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
+        grovepi = new GrovePi4J();
     }
 
     protected int getAnalogValue(byte[] value) {
