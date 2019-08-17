@@ -1,6 +1,5 @@
 package javaProject.handler.greengrass;
 
-import com.amazonaws.greengrass.javasdk.IotDataClient;
 import com.amazonaws.greengrass.javasdk.model.PublishRequest;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -29,7 +28,7 @@ public class PirSensor extends BaseSensor {
     private PutItemRequest requestPutItemRequest = new PutItemRequest().withTableName("JavaGreengrassRequest").addItemEntry("RequestType", new AttributeValue().withS("restroom")).addItemEntry("Request", new AttributeValue().withN("0"));
     private GroveLightSensor lightSensor0;
     private GroveSoundSensor soundSensor1;
-    private GroveDigitalIn digitalIn7;
+    private GroveDigitalIn digitalIn2;
     private GroveDigitalOut digitalOut3;
     private GroveDigitalOut digitalOut4;
     private int count = 0;
@@ -46,7 +45,7 @@ public class PirSensor extends BaseSensor {
         GrovePi grovepi = new GrovePi4J();
         lightSensor0 = new GroveLightSensor(grovepi, 0);
         soundSensor1 = new GroveSoundSensor(grovepi, 1);
-        digitalIn7 = grovepi.getDigitalIn(7);
+        digitalIn2 = grovepi.getDigitalIn(2);
         digitalOut3 = grovepi.getDigitalOut(3);
         digitalOut4 = grovepi.getDigitalOut(4);
         amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassSensorType").addItemEntry("SensorType", new AttributeValue().withS("pir")).addItemEntry("SensorId", new AttributeValue().withS(serial)).addItemEntry("Uses", new AttributeValue().withS(getSystemEnv("USES"))));
@@ -56,7 +55,7 @@ public class PirSensor extends BaseSensor {
     public void run() {
         try {
             long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
-            boolean b = digitalIn7.get();
+            boolean b = digitalIn2.get();
             digitalOut3.set(b);
             int light = lightSensor0.get().intValue();
             int sound = soundSensor1.get().intValue();
