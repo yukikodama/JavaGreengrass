@@ -1,17 +1,13 @@
 package javaProject.handler.greengrass;
 
-
-import com.amazonaws.greengrass.javasdk.model.PublishRequest;
 import org.iot.raspberry.grovepi.GroveAnalogIn;
 import org.iot.raspberry.grovepi.devices.GroveTemperatureAndHumiditySensor;
 import org.iot.raspberry.grovepi.devices.GroveTemperatureAndHumidityValue;
-import org.json.JSONObject;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
@@ -50,15 +46,6 @@ public class MoistureSensor extends BaseSensor {
             int moisture = this.getAnalogValue(analogIn2.get());
             int temperature = (int) dht.getTemperature();
             int humidity = (int) dht.getHumidity();
-            String publishMessage = new JSONObject()
-                    .put("SensorId", serial)
-                    .put("CreateAt", createAt)
-                    .put("UpdateAt", updateAt)
-                    .put("Moisture", moisture)
-                    .put("Temperature", temperature)
-                    .put("Humidity", humidity)
-                    .put("TTL", (updateAt / 1000) + 900)
-                    .toString();
             HashMap<String, AttributeValue> itemValues = new HashMap<>();
             itemValues.put("SensorId", AttributeValue.builder().s(serial).build());
             itemValues.put("CreateAt", AttributeValue.builder().n(String.valueOf(createAt)).build());
@@ -68,7 +55,6 @@ public class MoistureSensor extends BaseSensor {
             itemValues.put("Humidity", AttributeValue.builder().n(String.valueOf(temperature)).build());
             itemValues.put("TTL", AttributeValue.builder().n(String.valueOf((updateAt / 1000) + 900)).build());
             dynamoDbClient.putItem(PutItemRequest.builder().tableName("JavaGreengrassMoistureSensor").item(itemValues).build());
-            iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
             System.err.println(ex);
         }
