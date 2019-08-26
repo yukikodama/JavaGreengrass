@@ -2,12 +2,11 @@ package javaProject.handler.greengrass;
 
 
 import com.amazonaws.greengrass.javasdk.model.PublishRequest;
-import software.amazon.awssdk.regions.Region;
-
 import org.iot.raspberry.grovepi.GroveAnalogIn;
 import org.iot.raspberry.grovepi.devices.GroveTemperatureAndHumiditySensor;
 import org.iot.raspberry.grovepi.devices.GroveTemperatureAndHumidityValue;
 import org.json.JSONObject;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
@@ -36,10 +35,10 @@ public class MoistureSensor extends BaseSensor {
         analogIn2 = grovepi.getAnalogIn(2, 4);
         dht2 = new GroveTemperatureAndHumiditySensor(grovepi, 2, GroveTemperatureAndHumiditySensor.Type.DHT11);
 
-        HashMap<String,AttributeValue> itemValues = new HashMap<>();
+        HashMap<String, AttributeValue> itemValues = new HashMap<>();
         itemValues.put("SensorType", AttributeValue.builder().s("moisture").build());
         itemValues.put("SensorId", AttributeValue.builder().s(serial).build());
-        itemValues.put("Uses", AttributeValue.builder().s("moisture").build());
+        itemValues.put("Uses", AttributeValue.builder().s(getSystemEnv("USES")).build()); // moisture
         dynamoDbClient.putItem(PutItemRequest.builder().tableName("JavaGreengrassSensorType").item(itemValues).build());
     }
 
@@ -60,7 +59,7 @@ public class MoistureSensor extends BaseSensor {
                     .put("Humidity", humidity)
                     .put("TTL", (updateAt / 1000) + 900)
                     .toString();
-            HashMap<String,AttributeValue> itemValues = new HashMap<>();
+            HashMap<String, AttributeValue> itemValues = new HashMap<>();
             itemValues.put("SensorId", AttributeValue.builder().s(serial).build());
             itemValues.put("CreateAt", AttributeValue.builder().n(String.valueOf(createAt)).build());
             itemValues.put("UpdateAt", AttributeValue.builder().n(String.valueOf(updateAt)).build());

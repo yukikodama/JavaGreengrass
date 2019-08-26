@@ -1,16 +1,11 @@
 package javaProject.handler.api;
 
 import com.amazonaws.serverless.proxy.internal.testutils.MockLambdaContext;
-
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link PirSensor}. Modify the tests in order to support your use case as you build your project.

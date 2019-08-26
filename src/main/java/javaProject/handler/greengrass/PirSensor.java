@@ -1,7 +1,6 @@
 package javaProject.handler.greengrass;
 
 import com.amazonaws.greengrass.javasdk.model.PublishRequest;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.iot.raspberry.grovepi.GroveDigitalIn;
 import org.iot.raspberry.grovepi.GroveDigitalOut;
@@ -54,10 +53,10 @@ public class PirSensor extends BaseSensor {
         digitalOut3 = grovepi.getDigitalOut(3);
         digitalOut4 = grovepi.getDigitalOut(4);
 
-        HashMap<String,AttributeValue> itemValues = new HashMap<>();
+        HashMap<String, AttributeValue> itemValues = new HashMap<>();
         itemValues.put("SensorType", AttributeValue.builder().s("pir").build());
         itemValues.put("SensorId", AttributeValue.builder().s(serial).build());
-        itemValues.put("Uses", AttributeValue.builder().s("moisture").build());
+        itemValues.put("Uses", AttributeValue.builder().s(getSystemEnv("USES")).build());
         dynamoDbClient.putItem(PutItemRequest.builder().tableName("JavaGreengrassSensorType").item(itemValues).build());
     }
 
@@ -87,7 +86,7 @@ public class PirSensor extends BaseSensor {
                     .put("During", count)
                     .put("TTL", (updateAt / 1000) + 900)
                     .put("Request", request).toString();
-            HashMap<String,AttributeValue> itemValues = new HashMap<>();
+            HashMap<String, AttributeValue> itemValues = new HashMap<>();
             itemValues.put("SensorId", AttributeValue.builder().s(serial).build());
             itemValues.put("CreateAt", AttributeValue.builder().n(String.valueOf(createAt)).build());
             itemValues.put("UpdateAt", AttributeValue.builder().n(String.valueOf(updateAt)).build());

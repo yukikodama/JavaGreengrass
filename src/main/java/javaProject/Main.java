@@ -4,7 +4,8 @@ public class Main {
     public static final void main(String... args) {
         System.out.println("HelloWorld.");
         try {
-            new Main().execute();;
+            new Main().execute();
+            ;
         } catch (Exception e) {
             e.printStackTrace();
         }

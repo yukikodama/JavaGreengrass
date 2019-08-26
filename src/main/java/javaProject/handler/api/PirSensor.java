@@ -79,7 +79,7 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         List<JSONObject> pirSensor = dynamoDbClient.query(createQueryRequest()).items().stream().map(item -> item.get("SensorId").s()).map(sensorId -> {
             HashMap<String, AttributeValue> values = new HashMap<>();
             values.put(":s", AttributeValue.builder().s(sensorId).build());
-            QueryRequest queryRequest =QueryRequest.builder().tableName(getSensorTableName()).keyConditionExpression("SensorId = :s").expressionAttributeValues(values).limit(this.getLimit(event)).scanIndexForward(false).build();
+            QueryRequest queryRequest = QueryRequest.builder().tableName(getSensorTableName()).keyConditionExpression("SensorId = :s").expressionAttributeValues(values).limit(this.getLimit(event)).scanIndexForward(false).build();
             QueryResponse queryResult = dynamoDbClient.query(queryRequest);
             return queryResult.items().stream().map(m -> this.createJSONObject(m));
         }).flatMap(m -> m).peek(System.out::println).distinct().collect(Collectors.toList());
