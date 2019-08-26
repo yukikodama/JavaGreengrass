@@ -1,31 +1,33 @@
 package javaProject.handler.api;
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.QueryRequest;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import org.json.JSONObject;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class MoistureSensor extends PirSensor {
 
     protected QueryRequest createQueryRequest() {
-        return new QueryRequest().withTableName("JavaGreengrassSensorType")
-                .withKeyConditionExpression("SensorType = :t ")
-                .withFilterExpression("Uses = :u")
-                .addExpressionAttributeValuesEntry(":t", new AttributeValue().withS("moisture"))
-                .addExpressionAttributeValuesEntry(":u", new AttributeValue().withS("moisture"));
+        HashMap<String, AttributeValue> values = new HashMap<>();
+        values.put(":t", AttributeValue.builder().s("moisture").build());
+        values.put(":u", AttributeValue.builder().s("moisture").build());
+        return QueryRequest.builder().tableName("JavaGreengrassSensorType")
+                .keyConditionExpression("SensorType = :t ")
+                .filterExpression("Uses = :u")
+                .expressionAttributeValues(values).build();
     }
 
     protected JSONObject createJSONObject(final Map<String, AttributeValue> m) {
         return new JSONObject()
-                .put("SensorId", m.get("SensorId").getS())
-                .put("CreateAt", Long.valueOf(m.get("CreateAt").getN()))
-                .put("UpdateAt", Long.valueOf(m.get("UpdateAt").getN()))
-                .put("Moisture", Integer.valueOf(m.get("Moisture").getN()))
-                .put("Temperature", Integer.valueOf(m.get("Moisture").getN()))
-                .put("Humidity", Integer.valueOf(m.get("Moisture").getN()))
-                .put("TTL", Integer.valueOf(m.get("TTL").getN()));
+                .put("SensorId", m.get("SensorId").s())
+                .put("CreateAt", Long.valueOf(m.get("CreateAt").n()))
+                .put("UpdateAt", Long.valueOf(m.get("UpdateAt").n()))
+                .put("Moisture", Integer.valueOf(m.get("Moisture").n()))
+                .put("Temperature", Integer.valueOf(m.get("Moisture").n()))
+                .put("Humidity", Integer.valueOf(m.get("Moisture").n()))
+                .put("TTL", Integer.valueOf(m.get("TTL").n()));
     }
 
     protected String getSensorTableName() {

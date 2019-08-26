@@ -1,24 +1,26 @@
 package javaProject.handler.greengrass;
 
+
 import com.amazonaws.greengrass.javasdk.model.PublishRequest;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+import software.amazon.awssdk.regions.Region;
+
 import org.iot.raspberry.grovepi.GroveAnalogIn;
 import org.iot.raspberry.grovepi.devices.GroveTemperatureAndHumiditySensor;
 import org.iot.raspberry.grovepi.devices.GroveTemperatureAndHumidityValue;
 import org.json.JSONObject;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.Timer;
 
 public class MoistureSensor extends BaseSensor {
     private static final String TOPIC = "topic/moisturesensor";
-    private AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
+    private DynamoDbClient dynamoDbClient = DynamoDbClient.builder().region(Region.US_EAST_1).build();
     private GroveAnalogIn analogIn2;
     private GroveTemperatureAndHumiditySensor dht2;
 
@@ -33,7 +35,12 @@ public class MoistureSensor extends BaseSensor {
     private MoistureSensor() throws Exception {
         analogIn2 = grovepi.getAnalogIn(2, 4);
         dht2 = new GroveTemperatureAndHumiditySensor(grovepi, 2, GroveTemperatureAndHumiditySensor.Type.DHT11);
-        amazonDynamoDB.putItem(new PutItemRequest().withTableName("JavaGreengrassSensorType").addItemEntry("SensorType", new AttributeValue().withS("moisture")).addItemEntry("SensorId", new AttributeValue().withS(serial)).addItemEntry("Uses", new AttributeValue().withS("moisture")));
+
+        HashMap<String,AttributeValue> itemValues = new HashMap<>();
+        itemValues.put("SensorType", AttributeValue.builder().s("moisture").build());
+        itemValues.put("SensorId", AttributeValue.builder().s(serial).build());
+        itemValues.put("Uses", AttributeValue.builder().s("moisture").build());
+        dynamoDbClient.putItem(PutItemRequest.builder().tableName("JavaGreengrassSensorType").item(itemValues).build());
     }
 
     @Override
@@ -53,17 +60,16 @@ public class MoistureSensor extends BaseSensor {
                     .put("Humidity", humidity)
                     .put("TTL", (updateAt / 1000) + 900)
                     .toString();
-            amazonDynamoDB.putItem(new PutItemRequest()
-                    .withTableName("JavaGreengrassMoistureSensor")
-                    .addItemEntry("SensorId", new AttributeValue().withS(serial))
-                    .addItemEntry("CreateAt", new AttributeValue().withN(String.valueOf(createAt)))
-                    .addItemEntry("UpdateAt", new AttributeValue().withN(String.valueOf(updateAt)))
-                    .addItemEntry("Moisture", new AttributeValue().withN(String.valueOf(moisture)))
-                    .addItemEntry("Temperature", new AttributeValue().withN(String.valueOf(temperature)))
-                    .addItemEntry("Humidity", new AttributeValue().withN(String.valueOf(humidity)))
-                    .addItemEntry("TTL", new AttributeValue().withN(String.valueOf((updateAt / 1000) + 900)))
-            );
-            // iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
+            HashMap<String,AttributeValue> itemValues = new HashMap<>();
+            itemValues.put("SensorId", AttributeValue.builder().s(serial).build());
+            itemValues.put("CreateAt", AttributeValue.builder().n(String.valueOf(createAt)).build());
+            itemValues.put("UpdateAt", AttributeValue.builder().n(String.valueOf(updateAt)).build());
+            itemValues.put("Moisture", AttributeValue.builder().n(String.valueOf(moisture)).build());
+            itemValues.put("Temperature", AttributeValue.builder().n(String.valueOf(temperature)).build());
+            itemValues.put("Humidity", AttributeValue.builder().n(String.valueOf(temperature)).build());
+            itemValues.put("TTL", AttributeValue.builder().n(String.valueOf((updateAt / 1000) + 900)).build());
+            dynamoDbClient.putItem(PutItemRequest.builder().tableName("JavaGreengrassMoistureSensor").item(itemValues).build());
+            iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
             System.err.println(ex);
         }
