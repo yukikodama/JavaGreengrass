@@ -87,7 +87,7 @@ public class PirSensor extends BaseSensor {
                     .addItemEntry("TTL", new AttributeValue().withN(String.valueOf((updateAt / 1000) + 900)))
                     .addItemEntry("Request", new AttributeValue().withN(String.valueOf(request)))
             );
-            iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
+            // iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
             System.err.println(ex);
         }

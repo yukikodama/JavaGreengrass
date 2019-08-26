@@ -63,7 +63,7 @@ public class MoistureSensor extends BaseSensor {
                     .addItemEntry("Humidity", new AttributeValue().withN(String.valueOf(humidity)))
                     .addItemEntry("TTL", new AttributeValue().withN(String.valueOf((updateAt / 1000) + 900)))
             );
-            iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
+            // iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
         } catch (Exception ex) {
             System.err.println(ex);
         }
