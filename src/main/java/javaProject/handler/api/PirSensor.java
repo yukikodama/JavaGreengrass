@@ -73,6 +73,8 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         Calendar calendar = Calendar.getInstance();
         int week_int = calendar.get(Calendar.DAY_OF_WEEK);
         int hour_int = calendar.get(Calendar.HOUR_OF_DAY);
+        logger.log("DAY_OF_WEEK: " + week_int);
+        logger.log("HOUR_OF_DAY: " + hour_int);
         return (2 <= week_int && week_int <= 6) && (0 <= hour_int && hour_int <= 9);
     }
 
