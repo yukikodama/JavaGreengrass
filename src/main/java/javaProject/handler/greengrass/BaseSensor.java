@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Calendar;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,5 +40,12 @@ public abstract class BaseSensor extends TimerTask {
 
     public String handleRequest(Object event, Context context) {
         return "ok";
+    }
+
+    protected boolean isWorktime() {
+        Calendar calendar = Calendar.getInstance();
+        int week_int = calendar.get(Calendar.DAY_OF_WEEK);
+        int hour_int = calendar.get(Calendar.HOUR_OF_DAY);
+        return (2 <= week_int && week_int <= 6) && (8 <= hour_int && hour_int <= 18);
     }
 }
