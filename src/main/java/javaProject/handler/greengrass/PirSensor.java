@@ -96,7 +96,8 @@ public class PirSensor extends BaseSensor {
             itemValues.put("Pir", AttributeValue.builder().n(String.valueOf(BooleanUtils.toInteger(b))).build());
             itemValues.put("Light", AttributeValue.builder().n(String.valueOf(light)).build());
             itemValues.put("Sound", AttributeValue.builder().n(String.valueOf(sound)).build());
-            itemValues.put("TTL", AttributeValue.builder().n(String.valueOf((updateAt / 1000) + 900)).build());
+            itemValues.put("During", AttributeValue.builder().n(String.valueOf(sound)).build());
+            itemValues.put("TTL", AttributeValue.builder().n(String.valueOf(count)).build());
             itemValues.put("Request", AttributeValue.builder().n(String.valueOf(request)).build());
             dynamoDbClient.putItem(PutItemRequest.builder().tableName("JavaGreengrassPirSensor").item(itemValues).build());
             iotDataClient.publish(new PublishRequest().withTopic(TOPIC).withPayload(ByteBuffer.wrap(publishMessage.getBytes())));
