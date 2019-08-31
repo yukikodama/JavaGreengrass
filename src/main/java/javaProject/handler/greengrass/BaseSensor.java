@@ -46,6 +46,7 @@ public abstract class BaseSensor extends TimerTask {
         Calendar calendar = Calendar.getInstance();
         int week_int = calendar.get(Calendar.DAY_OF_WEEK);
         int hour_int = calendar.get(Calendar.HOUR_OF_DAY);
-        return (2 <= week_int && week_int <= 7) && (8 <= hour_int && hour_int <= 18);
+        return true;
+        // return (2 <= week_int && week_int <= 7) && (8 <= hour_int && hour_int <= 18);
     }
 }
