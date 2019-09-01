@@ -52,7 +52,7 @@ public class MoistureSensor extends BaseSensor {
             itemValues.put("UpdateAt", AttributeValue.builder().n(String.valueOf(updateAt)).build());
             itemValues.put("Moisture", AttributeValue.builder().n(String.valueOf(moisture)).build());
             itemValues.put("Temperature", AttributeValue.builder().n(String.valueOf(temperature)).build());
-            itemValues.put("Humidity", AttributeValue.builder().n(String.valueOf(temperature)).build());
+            itemValues.put("Humidity", AttributeValue.builder().n(String.valueOf(humidity)).build());
             itemValues.put("TTL", AttributeValue.builder().n(String.valueOf((updateAt / 1000) + 900)).build());
             dynamoDbClient.putItem(PutItemRequest.builder().tableName("JavaGreengrassMoistureSensor").item(itemValues).build());
         } catch (Exception ex) {
