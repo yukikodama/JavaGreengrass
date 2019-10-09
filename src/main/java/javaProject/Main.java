@@ -5,13 +5,11 @@ public class Main {
         System.out.println("HelloWorld.");
         try {
             new Main().execute();
-            ;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void execute() {
-
     }
 }

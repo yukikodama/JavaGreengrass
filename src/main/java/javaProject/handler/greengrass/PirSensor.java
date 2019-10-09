@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 
 public class PirSensor extends BaseSensor {
@@ -77,7 +78,7 @@ public class PirSensor extends BaseSensor {
                 digitalOut4.set(false);
             }
 
-            HashMap<String, AttributeValue> itemValues = new HashMap<>();
+            Map<String, AttributeValue> itemValues = new HashMap<>();
             itemValues.put("SensorId", AttributeValue.builder().s(serial).build());
             itemValues.put("CreateAt", AttributeValue.builder().n(String.valueOf(createAt)).build());
             itemValues.put("UpdateAt", AttributeValue.builder().n(String.valueOf(updateAt)).build());
