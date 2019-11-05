@@ -60,9 +60,6 @@ public class PirSensor extends BaseSensor {
 
     @Override
     public void run() {
-        if (!isWorktime()) {
-            return;
-        }
         try {
             long updateAt = LocalDateTime.now().atZone(ZoneOffset.ofHours(+9)).toInstant().toEpochMilli();
             boolean b = digitalIn2.get();

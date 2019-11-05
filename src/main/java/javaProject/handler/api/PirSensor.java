@@ -69,23 +69,10 @@ public class PirSensor implements RequestHandler<APIGatewayProxyRequestEvent, AP
         return "JavaGreengrassPirSensor";
     }
 
-    boolean isWorktime() {
-        Calendar calendar = Calendar.getInstance();
-        int week_int = calendar.get(Calendar.DAY_OF_WEEK);
-        int hour_int = calendar.get(Calendar.HOUR_OF_DAY);
-        logger.log("DAY_OF_WEEK: " + week_int);
-        logger.log("HOUR_OF_DAY: " + hour_int);
-        return (2 <= week_int && week_int <= 7) && (0 <= hour_int && hour_int <= 12);
-    }
-
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent event, final Context context) {
         logger = context.getLogger();
         logger.log("event: " + event);
         logger.log("context: " + context);
-
-        if (!isWorktime()) {
-            return new APIGatewayProxyResponseEvent().withStatusCode(200).withHeaders(headers).withBody(new JSONObject().put("results", java.util.Collections.emptyList()).toString());
-        }
 
         if ("POST".equals(event.getHttpMethod().toUpperCase())) {
             postExecute();
